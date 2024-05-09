@@ -26,6 +26,12 @@ class LoanSerializer(serializers.ModelSerializer):
             "outstanding",
         )
 
+    # pylint: disable=W0237
+    def validate(self, data):
+        """ Validate crucial data """
+        data['customer'].clean()
+        return data
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         customer = instance.customer

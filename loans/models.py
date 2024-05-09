@@ -38,13 +38,15 @@ class Loan(models.Model):
     )
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.outstanding = self.amount
-        super().save(*args, **kwargs)
-
     def clean(self):
         # pylint: disable=E1101
         credit_avaliable = self.customer.score
         if self.amount > credit_avaliable:
-            raise ValidationError(f"El prestamo no puede ser mayor a {credit_avaliable}")
+            raise ValidationError({
+                "detail": f"El prestamo no puede ser mayor a {credit_avaliable}"})
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.outstanding = self.amount
+        self.clean()
+        super().save(*args, **kwargs)
