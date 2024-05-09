@@ -11,11 +11,10 @@ class CustomerSerializer(serializers.ModelSerializer):
         """ Class Meta"""
         model = Customer
         fields = (
-            "id",
             "score",
             "status",
             "external_id",
             "preapproved_at",
         )
 
-        read_only_fields = ("outstanding", )
+        read_only_fields = ("outstanding", "")
