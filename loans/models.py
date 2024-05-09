@@ -1,6 +1,7 @@
 """ Model Loans """
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
 from customers.models import Customer
 
 class Loan(models.Model):
@@ -41,3 +42,9 @@ class Loan(models.Model):
         if not self.pk:
             self.outstanding = self.amount
         super().save(*args, **kwargs)
+
+    def clean(self):
+        # pylint: disable=E1101
+        credit_avaliable = self.customer.score
+        if self.amount > credit_avaliable:
+            raise ValidationError(f"El prestamo no puede ser mayor a {credit_avaliable}")
