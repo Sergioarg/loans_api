@@ -23,8 +23,3 @@ class Customer(models.Model):
         validators=[MinValueValidator(0)]
     )
     preapproved_at = models.DateTimeField(null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        if self._state.adding:
-            self.external_id = f"external_{self.id}"
-        super().save(*args, **kwargs)

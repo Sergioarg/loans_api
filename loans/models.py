@@ -15,7 +15,7 @@ class Loan(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    external_id = models.CharField(max_length=60)
+    external_id = models.CharField(max_length=60, unique=True)
     amount = models.DecimalField(
         max_digits=12, decimal_places=2,
         validators=[MinValueValidator(0)]
@@ -35,4 +35,9 @@ class Loan(models.Model):
         validators=[MinValueValidator(0)],
         default=0
     )
-    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.outstanding = self.amount
+        super().save(*args, **kwargs)

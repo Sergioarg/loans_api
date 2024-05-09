@@ -16,7 +16,7 @@ class Payment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    external_id = models.CharField(max_length=60)
+    external_id = models.CharField(max_length=60, unique=True)
     total_amount = models.DecimalField(
         max_digits=20, decimal_places=10,
         validators=[MinValueValidator(0)]
@@ -39,8 +39,8 @@ class PaymentLoanDetail(models.Model):
         validators=[MinValueValidator(0)]
     )
 
-    loan_id = models.ForeignKey(Loan, on_delete=models.CASCADE)
-    payment_id = models.ForeignKey(Payment, on_delete=models.CASCADE)
+    loan = models.ForeignKey(Loan, on_delete=models.CASCADE)
+    payment = models.ForeignKey(Payment, on_delete=models.CASCADE)
 
     class Meta:
         """ Meta """
