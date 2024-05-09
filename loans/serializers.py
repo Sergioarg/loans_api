@@ -1,21 +1,23 @@
 """ Module Serilizers """
 from rest_framework import serializers
-from .models import Customer
+from .models import Loan
 
 
-class CustomerSerializer(serializers.ModelSerializer):
+class LoanSerializer(serializers.ModelSerializer):
     """
     Serializer for the Customer model.
     """
     class Meta:
         """ Class Meta"""
-        model = Customer
+        model = Loan
         fields = (
             "id",
-            "score",
+            "amount",
             "status",
+            "customer_id"
             "external_id",
-            "preapproved_at",
+            "outstanding",
+            "contract_version",
         )
 
         read_only_fields = ("outstanding", )

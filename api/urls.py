@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from customers.views_sets import CustomerViewSet # pylint: disable=E0401, E0611
+from customers.views import CustomerViewSet # pylint: disable=E0401, E0611
 
 # REST API
 router = DefaultRouter()
