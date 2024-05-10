@@ -1,10 +1,11 @@
 """ Model Customer """
+from decimal import Decimal
 from django.db import models
 from django.core.validators import MinValueValidator
 
 
 class Customer(models.Model):
-    """ Model Customer """
+    """ Represetantion of Customer model """
     STATUS_CHOICES = (
         (1, 'Active'),
         (2, 'Inactive')
@@ -20,6 +21,6 @@ class Customer(models.Model):
 
     score = models.DecimalField(
         max_digits=12, decimal_places=2,
-        validators=[MinValueValidator(0)]
+        validators=[MinValueValidator(Decimal('0.00'))]
     )
     preapproved_at = models.DateTimeField(null=True, blank=True)

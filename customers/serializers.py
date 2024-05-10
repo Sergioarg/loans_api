@@ -4,11 +4,8 @@ from .models import Customer
 
 
 class CustomerSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the Customer model.
-    """
+    """ Serializer of Customer model. """
     class Meta:
-        """ Class Meta"""
         model = Customer
         fields = (
             "score",

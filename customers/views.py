@@ -2,24 +2,22 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .models import Customer
-from loans.models import Loan
-from django.db import models
 
-from .serializers import CustomerSerializer
+from loans.models import Loan
 from loans.serializers import LoanSerializer
 from utils import calculate_total_debt
 
+from .models import Customer
+from .serializers import CustomerSerializer
 
 class CustomerViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows customers to be viewed or edited.
+    ViewSet of Customer model
     """
     # pylint: disable=E1101, W0613
     queryset = Customer.objects.all().order_by('id')
     serializer_class = CustomerSerializer
     # permission_classes = (permissions.IsAuthenticated,)
-
 
     @action(detail=True, methods=['GET'])
     def loans(self, request, pk) -> Response:
