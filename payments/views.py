@@ -1,7 +1,6 @@
 """ Module with CustomerViewSet """
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
-from rest_framework.decorators import action
 from .models import Payment
 from customers.models import Customer
 from .serializers import PaymentSerializer
@@ -26,9 +25,18 @@ class PaymentViewSet(viewsets.ModelViewSet):
         customer = Customer.objects.get(pk=customer_id)
         total_debt = calculate_total_debt(customer)
 
+        # Check if customer has loans
         if total_debt == 0:
             response = {"message": "This customer has no loans"}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            status_code = status.HTTP_400_BAD_REQUEST
+            return Response(response, status=status_code)
+
+        # Check payment are greater than total_debt
+        payment = request.data.get('total_amount')
+        if payment > total_debt:
+            response = {"message": "total_amount is greater than total debts"}
+            status_code = status.HTTP_400_BAD_REQUEST
+            return Response(response, status=status_code)
 
         response = super().create(request, *args, **kwargs)
         return response

@@ -11,19 +11,22 @@ class PaymentsTests(APITestCase):
     """ Test loans app routes """
 
     def setUp(self):
+        self.url_payments = reverse('payment-list')
+        self.url_loans = reverse('loan-list')
+
         customer_id = 1
         self.customer_body = {
             "external_id": "customer_01",
             "score": 3000
         }
         self.loan_body = {
-            "amount": 1000,
+            "amount": 3000,
             "external_id": "loan_01",
             "customer": customer_id
         }
         self.payment_body = {
             "total_amount": 200,
-            "external_id": "payment_010",
+            "external_id": "payment_01",
             "customer": customer_id,
             "payment_loan_detail": [
                 {"loan": 1, "amount": 100},
@@ -37,9 +40,21 @@ class PaymentsTests(APITestCase):
     def test_create_payment_of_customer_without_loans(self):
         """ Test create new user with a loan """
         # Arrange / Act
-        url_payments = reverse('payment-list')
-        response_payments = self.client.post(url_payments, self.payment_body, format='json')
+        response_payments = self.client.post(self.url_payments, self.payment_body, format='json')
         response_expected = {'message': 'This customer has no loans'}
+
+        # Assert
+        self.assertEqual(response_payments.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response_payments.json(), response_expected)
+
+    def test_create_payment_greater_than_total_debts(self):
+        """ Test create new user with a loan """
+        # Arrange / Act
+        self.client.post(self.url_loans, self.loan_body, format='json')
+
+        self.payment_body['total_amount'] = 4000
+        response_payments = self.client.post(self.url_payments, self.payment_body, format='json')
+        response_expected = {'message': 'total_amount is greater than total debts'}
 
         # Assert
         self.assertEqual(response_payments.status_code, status.HTTP_400_BAD_REQUEST)
