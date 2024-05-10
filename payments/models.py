@@ -1,8 +1,9 @@
 """ Model Payment """
+from decimal import Decimal
+from django.core.validators import MinValueValidator
 from django.db import models
 from customers.models import Customer
 from loans.models import Loan
-from django.core.validators import MinValueValidator
 
 
 class Payment(models.Model):
@@ -19,7 +20,7 @@ class Payment(models.Model):
     external_id = models.CharField(max_length=60, unique=True)
     total_amount = models.DecimalField(
         max_digits=20, decimal_places=10,
-        validators=[MinValueValidator(0)]
+        validators=[MinValueValidator(Decimal('0.00'))]
 
     )
     status = models.SmallIntegerField(
