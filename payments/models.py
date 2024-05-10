@@ -27,7 +27,7 @@ class Payment(models.Model):
         default=STATUS_PAYMENT_CHOICES[0][0]
     )
     paid_at = models.DateTimeField(auto_now_add=True)
-    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
 class PaymentLoanDetail(models.Model):
     """ Payment Loan Detail """
