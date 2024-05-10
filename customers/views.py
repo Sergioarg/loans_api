@@ -8,37 +8,18 @@ from django.db import models
 
 from .serializers import CustomerSerializer
 from loans.serializers import LoanSerializer
+from utils import calculate_total_debt
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows customers to be viewed or edited.
     """
-    # pylint: disable=E1101
+    # pylint: disable=E1101, W0613
     queryset = Customer.objects.all().order_by('id')
     serializer_class = CustomerSerializer
     # permission_classes = (permissions.IsAuthenticated,)
 
-    @action(detail=True, methods=['GET'])
-    def balance(self, request, pk) -> Response:
-
-        customer = self.get_object()
-        total_debt: float = Loan.objects.filter(
-            customer=customer,
-            status__in=[0, 1]
-        ).aggregate(total_debt=models.Sum('outstanding')).get('total_debt', 0)
-        score = customer.score
-        available_amount: float = score - total_debt
-
-        return Response(
-            {
-                "external_id": customer.external_id,
-                "score": score,
-                "available_amount": available_amount,
-                "total_debt": total_debt
-            },
-            status=status.HTTP_200_OK
-        )
 
     @action(detail=True, methods=['GET'])
     def loans(self, request, pk) -> Response:
@@ -49,3 +30,24 @@ class CustomerViewSet(viewsets.ModelViewSet):
         serializer = LoanSerializer(loans, many=True)
 
         return Response(serializer.data)
+
+
+    @action(detail=True, methods=['GET'])
+    def balance(self, request, pk) -> Response:
+        """ Returns all loans realted with the customer """
+
+        customer = self.get_object()
+        total_debt = calculate_total_debt(customer=customer)
+
+        score = customer.score
+        available_amount = score - total_debt
+
+        return Response(
+            {
+                "external_id": customer.external_id,
+                "score": score,
+                "available_amount": available_amount,
+                "total_debt": total_debt
+            },
+            status=status.HTTP_200_OK
+        )
