@@ -14,5 +14,3 @@ class LoansViewSet(viewsets.ModelViewSet):
     queryset = Loan.objects.all().order_by('id')
     serializer_class = LoanSerializer
     # permission_classes = (permissions.IsAuthenticated,)
-
-    
