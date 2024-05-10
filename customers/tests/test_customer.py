@@ -7,7 +7,7 @@ from customers.models import Customer
 
 # pylint: disable=E1101
 class CustomersTests(APITestCase):
-    """ Testing API """
+    """ Test customers app routes """
     def setUp(self):
         self.customer_body = {
             "external_id": "customer_01",

@@ -6,7 +6,8 @@ from loans.models import Loan
 
 # pylint: disable=E1101
 class LoansTests(APITestCase):
-    """ Testing API """
+    """ Test loans app routes """
+
     def setUp(self):
         self.customer_body = {
             "external_id": "customer_01",
