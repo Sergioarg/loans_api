@@ -1,9 +1,9 @@
 """ Module to test API """
+from decimal import Decimal
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from customers.models import Customer
-from decimal import Decimal
 
 # pylint: disable=E1101
 class CustomersTests(APITestCase):
@@ -15,7 +15,7 @@ class CustomersTests(APITestCase):
         }
 
     def test_create_customer(self):
-        """Test creating a new user"""
+        """ Test create new customer """
         # Arrange / Act
         url = reverse('customer-list')
         response = self.client.post(url, self.customer_body, format='json')
@@ -26,11 +26,12 @@ class CustomersTests(APITestCase):
         self.assertEqual(Customer.objects.get().external_id, 'customer_01')
 
     def test_get_customer(self):
-        """Test creating a new user"""
+        """ Test get customer by id """
+        # Arrange / Act
         url = reverse('customer-list')
         self.client.post(url, self.customer_body, format='json')
-        # Arrange / Act
-        response = self.client.get('/customers/1/')
+        customer_id = 1
+        response = self.client.get(f'/customers/{customer_id}/')
         customer_expected = {
             'score': '1000.00',
             'status': 1,
@@ -42,7 +43,8 @@ class CustomersTests(APITestCase):
         self.assertEqual(response.data, customer_expected)
 
     def test_get_customers(self):
-        """Test creating a new user"""
+        """ Test get customers created """
+        # Arrange / Act
         url = reverse('customer-list')
         self.client.post(url, self.customer_body, format='json')
         other_customer = {
@@ -51,7 +53,6 @@ class CustomersTests(APITestCase):
         }
         self.client.post(url, other_customer, format='json')
 
-        # Arrange / Act
         response = self.client.get('/customers/')
         customer_expected = {
             'score': '1000.00',
@@ -75,10 +76,11 @@ class CustomersTests(APITestCase):
 
     def test_get_customer_balance(self):
         """Test creating a new user"""
+        # Arrange / Act
         url = reverse('customer-list')
         self.client.post(url, self.customer_body, format='json')
-        # Arrange / Act
-        response = self.client.get('/customers/1/balance/')
+        customer_id = 1
+        response = self.client.get(f'/customers/{customer_id}/balance/')
         response_expected = {
             'external_id': 'customer_01',
             'score': Decimal('1000.00'),
@@ -90,12 +92,26 @@ class CustomersTests(APITestCase):
         self.assertEqual(response.data, response_expected)
 
     def test_get_customer_loans(self):
-        """Test creating a new user"""
+        # Arrange / Act
+        """ Test create get loans of customer """
         url = reverse('customer-list')
         self.client.post(url, self.customer_body, format='json')
-        # Arrange / Act
-        response = self.client.get('/customers/1/loans/')
+        customer_id = 1
+        response = self.client.get(f'/customers/{customer_id}/loans/')
         response_expected = []
         # Assert
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, response_expected)
+
+    def test_create_customer_existing_external_id(self):
+        """ Test create customer with existing external_id """
+        # Arrange / Act
+        url = reverse('customer-list')
+        self.client.post(url, self.customer_body, format='json')
+
+        response = self.client.post(url, self.customer_body, format='json')
+        expected_result = {'external_id': ['customer with this external id already exists.']}
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.json(), expected_result)

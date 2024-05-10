@@ -67,3 +67,19 @@ class LoansTests(APITestCase):
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response_loans.data), 1)
+
+    def test_create_loan_with_existing_external_id(self):
+        """ Test create customer with existing external_id """
+        # Arrange / Act
+        url = reverse('customer-list')
+        self.client.post(url, self.customer_body, format='json')
+
+        url_loans = reverse('loan-list')
+        self.client.post(url_loans, self.loan_body, format='json')
+
+        response = self.client.post(url_loans, self.loan_body, format='json')
+        expected_result = {'external_id': ['loan with this external id already exists.']}
+
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.json(), expected_result)
