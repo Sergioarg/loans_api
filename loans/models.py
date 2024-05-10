@@ -1,7 +1,7 @@
 """ Model Loans """
 from django.db import models
 from django.core.validators import MinValueValidator
-from django.core.exceptions import ValidationError
+from rest_framework import serializers
 from customers.models import Customer
 
 class Loan(models.Model):
@@ -41,9 +41,16 @@ class Loan(models.Model):
     def clean(self):
         # pylint: disable=E1101
         credit_avaliable = self.customer.score
-        if self.amount > credit_avaliable:
-            raise ValidationError({
-                "detail": f"El prestamo no puede ser mayor a {credit_avaliable}"})
+        amounts = Loan.objects.filter(
+            customer=self.customer,
+            status__in=(0, 1)
+        ).aggregate(total_amount=models.Sum('amount')).get('total_amount', 0)
+
+        total_amount = amounts + self.amount
+        if total_amount > credit_avaliable:
+            raise serializers.ValidationError({
+                "detail": f"You cannot create a loan greater than this amount: {credit_avaliable}."
+            })
 
     def save(self, *args, **kwargs):
         if not self.pk:
