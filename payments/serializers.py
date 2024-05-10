@@ -15,7 +15,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             "total_amount",
             "status",
             "paid_at",
-            "customer_id"
+            "customer"
         )
 
         read_only_fields = ("outstanding", )

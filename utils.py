@@ -1,13 +1,16 @@
 # pylint: disable=E1101
+from django.db import models
 from customers.models import Customer
 from loans.models import Loan
-from django.db import models
-
-
 
 def calculate_total_debt(customer: Customer) -> float:
-    """
-    Calcula el total de la deuda para un cliente específico.
+    """Calculate the total debt of the customer
+
+    Args:
+        customer (Customer): instance of customer
+
+    Returns:
+        float: total debt of customer if the customer does not have return 0
     """
     total_debt = Loan.objects.filter(
         customer=customer,
