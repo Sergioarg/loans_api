@@ -14,4 +14,4 @@ class CustomerSerializer(serializers.ModelSerializer):
             "preapproved_at",
         )
 
-        read_only_fields = ("outstanding", "")
+        read_only_fields = ("outstanding", )

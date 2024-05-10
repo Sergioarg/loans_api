@@ -3,6 +3,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from customers.models import Customer
+from decimal import Decimal
 
 # pylint: disable=E1101
 class CustomersTests(APITestCase):
@@ -70,3 +71,31 @@ class CustomersTests(APITestCase):
         self.assertEqual(Customer.objects.count(), 2)
         self.assertEqual(response.data['results'][0], customer_expected)
         self.assertEqual(response.data['results'][1], other_customer_expected)
+
+
+    def test_get_customer_balance(self):
+        """Test creating a new user"""
+        url = reverse('customer-list')
+        self.client.post(url, self.customer_body, format='json')
+        # Arrange / Act
+        response = self.client.get('/customers/1/balance/')
+        response_expected = {
+            'external_id': 'customer_01',
+            'score': Decimal('1000.00'),
+            'available_amount': Decimal('1000.00'),
+            'total_debt': 0
+        }
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, response_expected)
+
+    def test_get_customer_loans(self):
+        """Test creating a new user"""
+        url = reverse('customer-list')
+        self.client.post(url, self.customer_body, format='json')
+        # Arrange / Act
+        response = self.client.get('/customers/1/loans/')
+        response_expected = []
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, response_expected)
