@@ -19,8 +19,8 @@ class CustomerViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerSerializer
     # permission_classes = (permissions.IsAuthenticated,)
 
-    @action(detail=True, methods=['GET'], url_path='/balance/(?P<customer_id>[^/.]+)/balance')
-    def get_balance(self, request, customer) -> Response:
+    @action(detail=True, methods=['GET'])
+    def balance(self, request, pk) -> Response:
 
         customer = self.get_object()
         total_debt: float = Loan.objects.filter(
@@ -39,3 +39,13 @@ class CustomerViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_200_OK
         )
+
+    @action(detail=True, methods=['GET'])
+    def loans(self, request, pk) -> Response:
+
+        """ Retrive all loans by customer id """
+        customer = self.get_object()
+        loans = Loan.objects.filter(customer=customer)
+        serializer = LoanSerializer(loans, many=True)
+
+        return Response(serializer.data)

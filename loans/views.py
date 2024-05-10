@@ -15,10 +15,4 @@ class LoansViewSet(viewsets.ModelViewSet):
     serializer_class = LoanSerializer
     # permission_classes = (permissions.IsAuthenticated,)
 
-    @action(detail=False, methods=['GET'], url_path='customer/(?P<customer_id>[^/.]+)')
-    def get_loans_by_customer(self, request, customer_id=None):
-        """ Retrive all loans by customer id """
-        loans = self.queryset.filter(customer_id=customer_id)
-        serializer = self.serializer_class(loans, many=True)
-
-        return Response(serializer.data)
+    
