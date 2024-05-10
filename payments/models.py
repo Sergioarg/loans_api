@@ -9,8 +9,8 @@ class Payment(models.Model):
     """ Model Payment """
 
     STATUS_PAYMENT_CHOICES = (
-        (0, 'Completed'),
-        (1, 'Rejected'),
+        (1, 'Completed'),
+        (2, 'Rejected'),
     )
 
     created_at = models.DateTimeField(auto_now_add=True)

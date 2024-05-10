@@ -15,6 +15,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             "total_amount",
             "status",
             "paid_at",
+            "external_id",
             "customer"
         )
 
