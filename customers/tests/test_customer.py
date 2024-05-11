@@ -38,7 +38,7 @@ class CustomersTests(APITestCase):
         # Arrange / Act
         self.client.post(self.customer_url, self.customer_body, format='json')
         customer_id = 1
-        response = self.client.get(f'/customers/{customer_id}/')
+        response = self.client.get(f'/api/customers/{customer_id}/')
         customer_expected = {
             'score': '1000.00',
             'status': 1,
@@ -59,7 +59,7 @@ class CustomersTests(APITestCase):
         }
         self.client.post(self.customer_url, other_customer, format='json')
 
-        response = self.client.get('/customers/')
+        response = self.client.get('/api/customers/')
         customer_expected = {
             'score': '1000.00',
             'status': 1,
@@ -85,7 +85,7 @@ class CustomersTests(APITestCase):
         # Arrange / Act
         self.client.post(self.customer_url, self.customer_body, format='json')
         customer_id = 1
-        response = self.client.get(f'/customers/{customer_id}/balance/')
+        response = self.client.get(f'/api/customers/{customer_id}/balance/')
         response_expected = {
             'external_id': 'customer_01',
             'score': Decimal('1000.00'),
@@ -101,7 +101,7 @@ class CustomersTests(APITestCase):
         """ Test create get loans of customer """
         self.client.post(self.customer_url, self.customer_body, format='json')
         customer_id = 1
-        response = self.client.get(f'/customers/{customer_id}/loans/')
+        response = self.client.get(f'/api/customers/{customer_id}/loans/')
         response_expected = []
         # Assert
         self.assertEqual(response.status_code, status.HTTP_200_OK)
