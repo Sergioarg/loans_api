@@ -50,7 +50,7 @@ class PaymentsTests(APITestCase):
         """ Test create new user with a loan """
         # Arrange / Act
         response_payments = self.client.post(self.url_payments, self.payment_body, format='json')
-        response_expected = {'message': 'This customer has no loans'}
+        response_expected = {'details': ['This customer has no loans']}
 
         # Assert
         self.assertEqual(response_payments.status_code, status.HTTP_400_BAD_REQUEST)
@@ -63,7 +63,7 @@ class PaymentsTests(APITestCase):
 
         self.payment_body['total_amount'] = 4000
         response_payments = self.client.post(self.url_payments, self.payment_body, format='json')
-        response_expected = {'message': 'total_amount is greater than total debts'}
+        response_expected = {'details': ['total_amount is greater than total debts']}
 
         # Assert
         self.assertEqual(response_payments.status_code, status.HTTP_400_BAD_REQUEST)
