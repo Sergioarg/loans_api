@@ -67,17 +67,7 @@ class LoanSerializer(serializers.ModelSerializer):
                 )
         return amount
 
-    def validate(self, attrs):
-        """ Validations """
-
-        if self.instance is None:
-            loan = self.validate_new_loan(attrs)
-        else:
-            loan = self.validate_existing_loan(attrs)
-
-        return loan
-
-    def validate_new_loan(self, attrs): #TODO: CHANGE FOR validate_status
+    def validate_status(self, status):
         """Validate status of the new loan to create
 
         Args:
@@ -89,18 +79,18 @@ class LoanSerializer(serializers.ModelSerializer):
         Returns:
             dict: data of the loan
         """
-        status = attrs.get('status')
-        if status == LOANS_STATUS['ACTIVE']:
-            attrs['taken_at'] = datetime.now()
-        elif status == LOANS_STATUS['REJECTED'] or status == LOANS_STATUS['PAID']:
+
+        if status == LOANS_STATUS['REJECTED'] or status == LOANS_STATUS['PAID']:
             raise serializers.ValidationError({
                 "status": f"You can't create a loan with the status {status}"
             })
-        return attrs
+        return status
 
-    def validate_existing_loan(self, attrs):
-        # TODO: Implement or remove
-        return attrs
+    def create(self, validated_data):
+        if validated_data.get('status') == LOANS_STATUS['ACTIVE']:
+            validated_data['taken_at'] = datetime.now()
+
+        return super().create(validated_data)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
