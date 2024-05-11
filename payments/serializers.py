@@ -1,14 +1,12 @@
 # pylint: disable=E1101
 """ Module Serilizers """
 from rest_framework import serializers
-
+from django.core.exceptions import ObjectDoesNotExist
 from constans import LOANS_STATUS
 from customers.models import Customer
 from loans.models import Loan
 from utils import calculate_total_debt
-
 from .models import Payment, PaymentLoanDetail
-
 
 class PaymentLoanDetailSerializer(serializers.ModelSerializer):
     """
@@ -21,25 +19,24 @@ class PaymentLoanDetailSerializer(serializers.ModelSerializer):
             "amount",
             "loan",
         )
-        # "payment"
 
 class PaymentSerializer(serializers.ModelSerializer):
     """
     Serializer for Payments and PaymentLoanDetail model.
     """
-    payment_loan_details = PaymentLoanDetailSerializer(many=True)
+    payment_loan_details = PaymentLoanDetailSerializer(many=True, read_only=True)
     class Meta:
         """ Class Meta"""
         model = Payment
         fields = (
             "id",
             "total_amount",
-            "status",
             "paid_at",
             "external_id",
             "customer",
             "payment_loan_details"
         )
+
 
     def validate_total_amount(self, total_amount):
         """Validate payment data received
@@ -61,7 +58,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         # Check if customer has loans
         if total_debt == 0:
             raise serializers.ValidationError({
-                "details": "This customer has no loans"
+                "details": "The customer does not have loans"
             })
 
         # Check payment are greater than total_debt
@@ -72,6 +69,15 @@ class PaymentSerializer(serializers.ModelSerializer):
 
         return total_amount
 
+    def validate(self, attrs):
+
+        # Validating payment_loan_details
+        init_loan_details = self.initial_data.get('payment_loan_details')
+        payment_loan_details = self.validate_payment_loan_details(init_loan_details)
+        attrs['payment_loan_details'] = payment_loan_details
+
+        return super().validate(attrs)
+
     def validate_payment_loan_details(self, payment_loan_details_data):
         """Validate payment loan details receivedd
 
@@ -79,8 +85,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             payment_loan_details_data (list): list of dicts with info of payments
 
         Raises:
-            serializers.ValidationError: Loan of other customer
-            serializers.ValidationError: try to pay more
+            serializers.ValidationError: Cummon edge cases at moment to create payment
 
         Returns:
             dict: loans details with correct data
@@ -91,13 +96,18 @@ class PaymentSerializer(serializers.ModelSerializer):
 
         details_amouts = 0
         for detail_data in payment_loan_details_data:
-            loan = detail_data.get('loan')
-            detail_data_amount = detail_data.get('amount')
+            try:
+                loan = Loan.objects.get(pk=detail_data.get('loan'))
+            except ObjectDoesNotExist as exception:
+                raise serializers.ValidationError({
+                    "loan": exception
+                })
 
+            detail_data_amount = detail_data.get('amount')
             # Validate customer loans
             if customer != loan.customer:
                 raise serializers.ValidationError({
-                    "loan": f"This loan id {detail_data.get('loan').id} is invalid"
+                    "loan": f"This loan id {loan.id} is invalid"
                 })
 
             # Check if outstanding
@@ -106,10 +116,10 @@ class PaymentSerializer(serializers.ModelSerializer):
                     "amount": f"Amount {round(detail_data_amount, 2)} paid is greater than outstanding {loan.outstanding}"
                 })
             details_amouts += detail_data_amount
+            detail_data['loan'] = loan
 
         if total_amount != details_amouts:
             raise serializers.ValidationError({
-                "status": "Rejected",
                 "amount": f"All amounts {round(details_amouts, 2)} should be equal to {total_amount}"
             })
 
@@ -139,3 +149,9 @@ class PaymentSerializer(serializers.ModelSerializer):
     #         PaymentLoanDetail.objects.update_or_create(payment=instance, defaults=detail_data)
 
     #     return instance
+
+
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     representation['payment_loan_details'] = PaymentLoanDetailSerializer(instance.payment_loan_details.all(), many=True).data
+    #     return representation
