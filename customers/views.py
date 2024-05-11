@@ -7,6 +7,9 @@ from loans.models import Loan
 from loans.serializers import LoanSerializer
 from utils import calculate_total_debt
 
+from payments.models import Payment
+from payments.serializers import PaymentSerializer
+
 from .models import Customer
 from .serializers import CustomerSerializer
 
@@ -49,3 +52,13 @@ class CustomerViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_200_OK
         )
+
+    @action(detail=True, methods=['GET'])
+    def payments(self, request, pk) -> Response:
+        """ Retrive all payments of the user customer id """
+        customer = self.get_object()
+        payments = Payment.objects.filter(customer=customer)
+
+        payments_serializer = PaymentSerializer(payments, many=True)
+
+        return Response(payments_serializer.data, status=status.HTTP_200_OK)

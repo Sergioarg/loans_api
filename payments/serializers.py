@@ -29,14 +29,16 @@ class PaymentSerializer(serializers.ModelSerializer):
         """ Class Meta"""
         model = Payment
         fields = (
-            "id",
             "total_amount",
+            "status",
             "paid_at",
             "external_id",
             "customer",
             "payment_loan_details"
         )
-
+        extra_kwargs = {
+            'customer': {'write_only': True}
+        }
 
     def validate_total_amount(self, total_amount):
         """Validate payment data received
@@ -140,18 +142,15 @@ class PaymentSerializer(serializers.ModelSerializer):
 
         return payment
 
-    # def update(self, instance, validated_data):
-    #     payment_loan_details_data = validated_data.pop("payment_loan_details")
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        payment = instance
 
-    #     instance = super().update(instance, validated_data)
+        if payment:
+            rep['customer_external_id'] = payment.customer.external_id
+            loan_detail = PaymentLoanDetail.objects.filter(payment=payment)
+            if loan_detail.exists():
+                rep['loan_external_id'] = loan_detail[0].loan.external_id
+                rep['payment_amount'] = loan_detail[0].loan.amount
 
-    #     for detail_data in payment_loan_details_data:
-    #         PaymentLoanDetail.objects.update_or_create(payment=instance, defaults=detail_data)
-
-    #     return instance
-
-
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #     representation['payment_loan_details'] = PaymentLoanDetailSerializer(instance.payment_loan_details.all(), many=True).data
-    #     return representation
+        return rep
