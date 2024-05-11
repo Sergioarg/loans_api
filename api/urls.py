@@ -10,13 +10,13 @@ from customers.views import CustomerViewSet
 
 # REST API
 router = DefaultRouter()
-router.register(r'loans', LoansViewSet)
-router.register(r'payments', PaymentViewSet)
-router.register(r'customers', CustomerViewSet)
+router.register(r'api/customers', CustomerViewSet)
+router.register(r'api/loans', LoansViewSet)
+router.register(r'api/payments', PaymentViewSet)
 
 # Views
 urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
-    path('api-token-auth/', obtain_auth_token, name='api-token-auth'),
+    path('api/token-auth/', obtain_auth_token, name='api-token-auth'),
 ]
