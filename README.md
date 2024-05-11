@@ -75,9 +75,26 @@ The server will start at `http://localhost:8000`.
 
 To interact with the API, you can use tools like `curl`, Postman, or any HTTP client library in your preferred programming language.
 
+- **Obtain API Token**
+  - **Endpoint**: `/api/token-auth/`
+  - **Method**: `POST`
+  - **Body**:
+    ```json
+    {
+      "username": "exampleuser",
+      "password": "examplepassword"
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "token": "API-TOKEN"
+    }
+    ```
+
 ### Customers Management
 
-- **Create a User**
+- **Create a Customer**
   - **Endpoint**: `/api/customers/`
   - **Method**: `POST`
   - **Body**:
@@ -94,23 +111,6 @@ To interact with the API, you can use tools like `curl`, Postman, or any HTTP cl
       "status": 1,
       "external_id": "customer_01",
       "preapproved_at": null
-    }
-    ```
-
-- **Obtain API Token**
-  - **Endpoint**: `/api/token-auth/`
-  - **Method**: `POST`
-  - **Body**:
-    ```json
-    {
-      "username": "exampleuser",
-      "password": "examplepassword"
-    }
-    ```
-  - **Response**:
-    ```json
-    {
-      "token": "API-TOKEN"
     }
     ```
 
@@ -137,7 +137,7 @@ To interact with the API, you can use tools like `curl`, Postman, or any HTTP cl
       "customer_external_id": "customer_01"
     }
     ```
-<!-- ### Payment Management
+### Payment Management
 
 - **Create a Payment**
   - **Endpoint**: `/api/payments/`
@@ -156,13 +156,15 @@ To interact with the API, you can use tools like `curl`, Postman, or any HTTP cl
   - **Response**:
     ```json
     {
-      "external_id": "loan_01",
-      "amount": "100.00",
-      "status": 1,
-      "outstanding": "100.00",
-      "customer_external_id": "customer_01"
+      "total_amount": "1500",
+      "status": 4,
+      "paid_at": "2024-05-11T23:34:29.703632Z",
+      "external_id": "payment_48",
+      "customer_external_id": "customer_02",
+      "loan_external_id": "loan_02",
+      "payment_amount": 1500.0
     }
-    ``` -->
+    ```
 
 ### Run Tests
 Execute the Django test runner to run all tests in the project.
@@ -170,8 +172,6 @@ Execute the Django test runner to run all tests in the project.
 ```bash
 python manage.py test
 ```
-
-`curl -X GET http://127.0.0.1:8000/api/example/ -H 'Authorization: Token <ADD_TOKEN>'`
 
 ## Testing
 
