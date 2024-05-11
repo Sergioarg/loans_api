@@ -86,8 +86,10 @@ class PaymentSerializer(serializers.ModelSerializer):
             dict: loans details with correct data
         """
         customer_id = self.initial_data.get('customer')
+        total_amount = self.initial_data.get('total_amount')
         customer = Customer.objects.get(pk=customer_id)
 
+        details_amouts = 0
         for detail_data in payment_loan_details_data:
             loan = detail_data.get('loan')
             detail_data_amount = detail_data.get('amount')
@@ -103,6 +105,13 @@ class PaymentSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     "amount": f"Amount {round(detail_data_amount, 2)} paid is greater than outstanding {loan.outstanding}"
                 })
+            details_amouts += detail_data_amount
+
+        if total_amount != details_amouts:
+            raise serializers.ValidationError({
+                "status": "Rejected",
+                "amount": f"All amounts {round(details_amouts, 2)} should be equal to {total_amount}"
+            })
 
         return payment_loan_details_data
 
