@@ -122,7 +122,7 @@ class LoansTests(APITestCase):
 
         self.loan_body['status'] = LOANS_STATUS['REJECTED']
         response_loans = self.client.post(self.url_loans, self.loan_body, format='json')
-        response_expected = {'non_field_errors': ["You can't create a loan with the status 3"]}
+        response_expected = {'status': ["You can't create a loan with the status 3"]}
 
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_400_BAD_REQUEST)
@@ -135,7 +135,7 @@ class LoansTests(APITestCase):
 
         self.loan_body['status'] = LOANS_STATUS['PAID']
         response_loans = self.client.post(self.url_loans, self.loan_body, format='json')
-        response_expected = {'non_field_errors': ["You can't create a loan with the status 4"]}
+        response_expected = {'status': ["You can't create a loan with the status 4"]}
 
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_400_BAD_REQUEST)

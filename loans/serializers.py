@@ -47,7 +47,9 @@ class LoanSerializer(serializers.ModelSerializer):
                 customer = Customer.objects.get(id=customer_id)
             except ObjectDoesNotExist as exc:
                 _ = exc
-                raise serializers.ValidationError("Customer not found.")
+                raise serializers.ValidationError({
+                    "customer": "Customer not found."
+                })
 
             credit_available = customer.score
             total_amount = Loan.objects.filter(
@@ -61,7 +63,7 @@ class LoanSerializer(serializers.ModelSerializer):
 
             if total_amount + amount > credit_available:
                 raise serializers.ValidationError({
-                    "detail": f"You cannot create a loan greater than {credit_available} your current debt is {total_amount}."
+                    "amount": f"You cannot create a loan greater than {credit_available} your current debt is {total_amount}."
                 })
         return amount
 
@@ -91,7 +93,9 @@ class LoanSerializer(serializers.ModelSerializer):
         if status == LOANS_STATUS['ACTIVE']:
             attrs['taken_at'] = datetime.now()
         elif status == LOANS_STATUS['REJECTED'] or status == LOANS_STATUS['PAID']:
-            raise serializers.ValidationError(f"You can't create a loan with the status {status}")
+            raise serializers.ValidationError({
+                "status": f"You can't create a loan with the status {status}"
+            })
         return attrs
 
     def validate_existing_loan(self, attrs):
