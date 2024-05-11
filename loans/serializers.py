@@ -51,7 +51,6 @@ class LoanSerializer(serializers.ModelSerializer):
                     "customer": "Customer not found."
                 })
 
-            credit_available = customer.score
             total_amount = Loan.objects.filter(
                 customer=customer,
                 status__in=(0, LOANS_STATUS['PENDING'])
@@ -61,10 +60,11 @@ class LoanSerializer(serializers.ModelSerializer):
             if not total_amount:
                 total_amount = 0
 
-            if total_amount + amount > credit_available:
-                raise serializers.ValidationError({
-                    "amount": f"You cannot create a loan greater than {credit_available} your current debt is {total_amount}."
-                })
+            available_amount = customer.score - total_amount
+            if total_amount + amount > customer.score:
+                raise serializers.ValidationError(
+                    f"You cannot create for this amount, credit available {available_amount}"
+                )
         return amount
 
     def validate(self, attrs):
@@ -77,7 +77,7 @@ class LoanSerializer(serializers.ModelSerializer):
 
         return loan
 
-    def validate_new_loan(self, attrs):
+    def validate_new_loan(self, attrs): #TODO: CHANGE FOR validate_status
         """Validate status of the new loan to create
 
         Args:
@@ -99,7 +99,7 @@ class LoanSerializer(serializers.ModelSerializer):
         return attrs
 
     def validate_existing_loan(self, attrs):
-        # TODO: Implement
+        # TODO: Implement or remove
         return attrs
 
     def to_representation(self, instance):
