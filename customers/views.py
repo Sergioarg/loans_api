@@ -17,7 +17,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
     # pylint: disable=E1101, W0613
     queryset = Customer.objects.all().order_by('id')
     serializer_class = CustomerSerializer
-    # permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     @action(detail=True, methods=['GET'])
     def loans(self, request, pk) -> Response:

@@ -1,18 +1,17 @@
+# pylint: disable=E1101
 """ Module to test Loans API """
 from datetime import datetime
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from loans.models import Loan
 from constans import LOANS_STATUS
 
-# pylint: disable=E1101
 class LoansTests(APITestCase):
     """ Test Loans app routes """
 
     def setUp(self):
-        self.url_customers = reverse('customer-list')
-        self.url_loans = reverse('loan-list')
         self.customer_body = {
             "external_id": "customer_01",
             "score": 3000
@@ -22,6 +21,16 @@ class LoansTests(APITestCase):
             "external_id": "loan_01",
             "customer": 1
         }
+
+        self.url_customers = reverse('customer-list')
+        self.url_loans = reverse('loan-list')
+
+        # User Auth
+        User.objects.create_user(username="test", password="test")
+        auth_url = reverse("api-token-auth")
+        test_user_body = {"username": "test", "password": "test"}
+        response = self.client.post(auth_url, test_user_body, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + response.data['token'])
 
     def test_create_loan(self):
         """ Test create new user with a loan """

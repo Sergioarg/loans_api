@@ -1,11 +1,12 @@
-""" Module to test API """
+# pylint: disable=E1101
+""" Module to test Customer Services """
 from decimal import Decimal
 from django.urls import reverse
+from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 from rest_framework import status
 from customers.models import Customer
 
-# pylint: disable=E1101
 class CustomersTests(APITestCase):
     """ Test customers app routes """
     def setUp(self):
@@ -14,11 +15,18 @@ class CustomersTests(APITestCase):
             "score": 1000.00
         }
 
+        self.customer_url = reverse('customer-list')
+
+        User.objects.create_user(username="test", password="test")
+        auth_url = reverse("api-token-auth")
+        test_user_body = {"username": "test", "password": "test"}
+        response = self.client.post(auth_url, test_user_body, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + response.data['token'])
+
     def test_create_customer(self):
         """ Test create new customer """
         # Arrange / Act
-        url = reverse('customer-list')
-        response = self.client.post(url, self.customer_body, format='json')
+        response = self.client.post(self.customer_url, self.customer_body, format='json')
 
         # Assert
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -28,8 +36,7 @@ class CustomersTests(APITestCase):
     def test_get_customer(self):
         """ Test get customer by id """
         # Arrange / Act
-        url = reverse('customer-list')
-        self.client.post(url, self.customer_body, format='json')
+        self.client.post(self.customer_url, self.customer_body, format='json')
         customer_id = 1
         response = self.client.get(f'/customers/{customer_id}/')
         customer_expected = {
@@ -45,13 +52,12 @@ class CustomersTests(APITestCase):
     def test_get_customers(self):
         """ Test get customers created """
         # Arrange / Act
-        url = reverse('customer-list')
-        self.client.post(url, self.customer_body, format='json')
+        self.client.post(self.customer_url, self.customer_body, format='json')
         other_customer = {
             "external_id": "customer_02",
             "score": 2000.00
         }
-        self.client.post(url, other_customer, format='json')
+        self.client.post(self.customer_url, other_customer, format='json')
 
         response = self.client.get('/customers/')
         customer_expected = {
@@ -77,8 +83,7 @@ class CustomersTests(APITestCase):
     def test_get_customer_balance(self):
         """Test creating a new user"""
         # Arrange / Act
-        url = reverse('customer-list')
-        self.client.post(url, self.customer_body, format='json')
+        self.client.post(self.customer_url, self.customer_body, format='json')
         customer_id = 1
         response = self.client.get(f'/customers/{customer_id}/balance/')
         response_expected = {
@@ -94,8 +99,7 @@ class CustomersTests(APITestCase):
     def test_get_customer_loans(self):
         # Arrange / Act
         """ Test create get loans of customer """
-        url = reverse('customer-list')
-        self.client.post(url, self.customer_body, format='json')
+        self.client.post(self.customer_url, self.customer_body, format='json')
         customer_id = 1
         response = self.client.get(f'/customers/{customer_id}/loans/')
         response_expected = []
@@ -106,10 +110,9 @@ class CustomersTests(APITestCase):
     def test_create_customer_existing_external_id(self):
         """ Test create customer with existing external_id """
         # Arrange / Act
-        url = reverse('customer-list')
-        self.client.post(url, self.customer_body, format='json')
+        self.client.post(self.customer_url, self.customer_body, format='json')
 
-        response = self.client.post(url, self.customer_body, format='json')
+        response = self.client.post(self.customer_url, self.customer_body, format='json')
         expected_result = {'external_id': ['customer with this external id already exists.']}
 
         # Assert

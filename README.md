@@ -120,3 +120,6 @@ Loans:
 
 Payments:
     GET: /payments/{external_id}
+
+    "results": [
+`curl -X GET http://127.0.0.1:8000/api/example/ -H 'Authorization: Token <ADD_TOKEN>'`

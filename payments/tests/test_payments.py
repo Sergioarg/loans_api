@@ -1,5 +1,6 @@
 # pylint: disable=E1101
 """ Module to test API """
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
@@ -8,13 +9,11 @@ from payments.models import Payment, PaymentLoanDetail
 from customers.models import Customer
 
 class PaymentsTests(APITestCase):
-    """ Test loans app routes """
+    """ Test Payments Services """
 
     def setUp(self):
-        self.url_payments = reverse('payment-list')
-        self.url_loans = reverse('loan-list')
 
-        customer_id = 1
+        test_customer_id = 1
         self.customer_body = {
             "external_id": "customer_01",
             "score": 3000
@@ -22,17 +21,27 @@ class PaymentsTests(APITestCase):
         self.loan_body = {
             "amount": 3000,
             "external_id": "loan_01",
-            "customer": customer_id
+            "customer": test_customer_id
         }
         self.payment_body = {
             "total_amount": 200,
             "external_id": "payment_01",
-            "customer": customer_id,
+            "customer": test_customer_id,
             "payment_loan_detail": [
                 {"loan": 1, "amount": 100},
                 {"loan": 2, "amount": 200}
             ]
         }
+
+        self.url_payments = reverse('payment-list')
+        self.url_loans = reverse('loan-list')
+
+        User.objects.create_user(username="test", password="test")
+        auth_url = reverse("api-token-auth")
+        test_user_body = {"username": "test", "password": "test"}
+        response = self.client.post(auth_url, test_user_body, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + response.data['token'])
+
         if not Customer.objects.filter(external_id='customer_01').exists():
             url_customers = reverse('customer-list')
             self.client.post(url_customers, self.customer_body, format='json')

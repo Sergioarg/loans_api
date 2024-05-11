@@ -1,22 +1,22 @@
-""" Module with CustomerViewSet """
+""" Module with PaymentsViewSet """
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
-from .models import Payment
-from customers.models import Customer
-from .serializers import PaymentSerializer
 from utils import calculate_total_debt
+from customers.models import Customer
+from .models import Payment
+from .serializers import PaymentSerializer
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows customers to be viewed or edited.
+    Payment API
     """
     # pylint: disable=E1101
     queryset = Payment.objects.all().order_by('id')
     serializer_class = PaymentSerializer
-    # permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
-
+    # Customizing POST method
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -37,6 +37,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
             response = {"message": "total_amount is greater than total debts"}
             status_code = status.HTTP_400_BAD_REQUEST
             return Response(response, status=status_code)
+        
 
         response = super().create(request, *args, **kwargs)
         return response
