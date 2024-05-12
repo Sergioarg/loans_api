@@ -66,15 +66,11 @@ The server will start at `http://localhost:8000`.
 
 ## API Endpoints
 
-
-
-- loans:  `http://127.0.0.1:8000/api/loans/`
-- payments:  `http://127.0.0.1:8000/api/payments/`
-
-
 ### Usage
 
 To interact with the API, you can use tools like `curl`, Postman, or any HTTP client library in your preferred programming language.
+
+Endpoint: `http://127.0.0.1:8000/api/token-auth/`
 
 - **Obtain API Token**
   - **Endpoint**: `/api/token-auth/`
