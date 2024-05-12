@@ -2,18 +2,16 @@
 """ Module Serilizers """
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
-from constans import LOANS_STATUS
+from constans import LOANS_STATUS, PAYMENT_STATUS
 from customers.models import Customer
 from loans.models import Loan
 from utils import calculate_total_debt
 from .models import Payment, PaymentLoanDetail
 
 class PaymentLoanDetailSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the Customer model.
-    """
+    """ Serializer for the Customer model. """
     class Meta:
-        """ Class Meta"""
+        """Class Meta"""
         model = PaymentLoanDetail
         fields = (
             "amount",
@@ -40,6 +38,15 @@ class PaymentSerializer(serializers.ModelSerializer):
             'customer': {'write_only': True}
         }
 
+    def validate(self, attrs):
+        # Validating payment_loan_details
+        attrs = super().validate(attrs)
+        init_loan_details = self.initial_data.get('payment_loan_details')
+        payment_loan_details = self.validate_payment_loan_details(init_loan_details)
+        attrs['payment_loan_details'] = payment_loan_details
+
+        return attrs
+
     def validate_total_amount(self, total_amount):
         """Validate payment data received
 
@@ -53,32 +60,56 @@ class PaymentSerializer(serializers.ModelSerializer):
         Returns:
             dict: data of payment
         """
+        payment = self.instance
         customer_id = self.initial_data.get('customer')
-        customer = Customer.objects.get(pk=customer_id)
+        try:
+            customer = Customer.objects.get(pk=customer_id)
+        except ObjectDoesNotExist as exception:
+            raise serializers.ValidationError(exception)
+
         total_debt = calculate_total_debt(customer)
 
-        # Check if customer has loans
         if total_debt == 0:
-            raise serializers.ValidationError({
-                "details": "The customer does not have loans"
-            })
+            raise serializers.ValidationError(
+                "The customer does not have loans"
+            )
 
-        # Check payment are greater than total_debt
         if total_amount > total_debt:
-            raise serializers.ValidationError({
-                "total_amount": "total_amount is greater than total debts"
-            })
+            raise serializers.ValidationError(
+                f"total_amount is greater than total debts is {total_debt}"
+            )
 
+        if payment:
+            if self.initial_data.get('total_amount'):
+                raise serializers.ValidationError(
+                    "Cannot update total_amount after created"
+                )
+            if self.initial_data.get('payment_loan_details'):
+                raise serializers.ValidationError(
+                    "Cannot update payment_loan_details after created"
+                )
         return total_amount
 
-    def validate(self, attrs):
 
-        # Validating payment_loan_details
-        init_loan_details = self.initial_data.get('payment_loan_details')
-        payment_loan_details = self.validate_payment_loan_details(init_loan_details)
-        attrs['payment_loan_details'] = payment_loan_details
+    def validate_status(self, status):
+        """Validate status
 
-        return super().validate(attrs)
+        Args:
+            status (int): status recieved
+
+        Raises:
+            serializers.ValidationError: Try to change status rejected to accepted
+
+        Returns:
+            int: status correct
+        """
+        payment = self.instance
+        if payment.status == PAYMENT_STATUS["REJECTED"] and status == PAYMENT_STATUS["COMPLETED"]:
+            raise serializers.ValidationError(
+                "Cannot change rejected status to accepted status"
+            )
+        return status
+
 
     def validate_payment_loan_details(self, payment_loan_details_data):
         """Validate payment loan details receivedd
@@ -115,7 +146,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             # Check if outstanding
             if detail_data_amount > loan.outstanding:
                 raise serializers.ValidationError({
-                    "amount": f"Amount {round(detail_data_amount, 2)} paid is greater than outstanding {loan.outstanding}"
+                    "amount": f"Loan {loan.id} Amount {round(detail_data_amount, 2)} paid is greater than outstanding {loan.outstanding}"
                 })
             details_amouts += detail_data_amount
             detail_data['loan'] = loan
@@ -129,11 +160,12 @@ class PaymentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         payment_loan_details_data = validated_data.pop("payment_loan_details")
-
         payment = Payment.objects.create(**validated_data)
         for detail_data in payment_loan_details_data:
             loan = detail_data.get('loan')
-            loan.outstanding = round(loan.outstanding - detail_data.get('amount'), 2)
+
+            if payment.status == PAYMENT_STATUS['COMPLETED']:
+                loan.outstanding = round(loan.outstanding - detail_data.get('amount'), 2)
 
             if loan.outstanding == 0:
                 loan.status = LOANS_STATUS['PAID']
@@ -151,6 +183,6 @@ class PaymentSerializer(serializers.ModelSerializer):
             loan_detail = PaymentLoanDetail.objects.filter(payment=payment)
             if loan_detail.exists():
                 rep['loan_external_id'] = loan_detail[0].loan.external_id
-                rep['payment_amount'] = loan_detail[0].loan.amount
+                rep['payment_amount'] = loan_detail[0].amount
 
         return rep
