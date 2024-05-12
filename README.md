@@ -24,7 +24,7 @@ The API is structured around the following endpoints:
 
 1. Clone the repository:
     ```
-    git clone https://github.com/Sergioarg/users_api.git
+    git clone https://github.com/Sergioarg/loans_api.git
     ```
 2. Navigate to the project directory:
    ```
@@ -66,19 +66,7 @@ The server will start at `http://localhost:8000`.
 
 ## API Endpoints
 
-**Customers**: `/api/customers/`
 
-
-| Endpoint | Method | Description | Response | Request Body | Parameters |
-|----------|--------|-------------|-----------|--------------|------------|
-| `/api/customers/` | GET | Retrieves a list of all customtomers. | An array of `Customer` objects. | N/A | N/A |
-| `/api/customers/{id}` | GET | Retrieves a specific customer by their ID. | A `Customer` object or `404 Not Found` if the customer does not exist. | N/A | `id`: The ID of the customer. |
-| `/api/customers/{id}/balance` | GET | Retrieves the balance of the customer by their ID. | Balance of the customer | N/A | `id`: The ID of the customer. |
-| `/api/customers/{id}/loans` | GET | Retrieves the loans of the customer by their ID. | array of loans | N/A | `id`: The ID of the customer. |
-| `/api/customers/{id}/payments` | GET | Retrieves the payments of the customer by their ID. | array of patyments | N/A | `id`: The ID of the customer. |
-| `/api/customers/` | POST | Creates a new customer. | `201 Created` with the created `Customer` object and the location of the new resource. | A `Customer` object. | N/A |
-| `/api/customers/{id}` | PUT | Updates an existing customer. | `204 No Content` if the update is successful, or `404 Not Found` if the customer does not exist. | A `Customer` object with the fields to update. | `id`: The ID of the customer to update. |
-| `/api/customers/{id}` | DELETE | Deletes a specific customer by their ID. | `200 OK` if the deletion is successful, or `404 Not Found` if the customer does not exist. | N/A | `id`: The ID of the customer to delete. |
 
 - loans:  `http://127.0.0.1:8000/api/loans/`
 - payments:  `http://127.0.0.1:8000/api/payments/`
@@ -107,6 +95,90 @@ To interact with the API, you can use tools like `curl`, Postman, or any HTTP cl
 
 ### Customers Management
 
+<details>
+  <summary>Table of methods</summary>
+  <table>
+  <thead>
+    <tr>
+      <th>Endpoint</th>
+      <th>Method</th>
+      <th>Description</th>
+      <th>Response</th>
+      <th>Request Body</th>
+      <th>Parameters</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>/api/customers/</td>
+      <td>GET</td>
+      <td>Retrieves a list of all customers.</td>
+      <td>An array of <code>Customer</code> objects.</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>/api/customers/{id}</td>
+      <td>GET</td>
+      <td>Retrieves a specific customer by their ID.</td>
+      <td>A <code>Customer</code> object or <code>404 Not Found</code> if the customer does not exist.</td>
+      <td>N/A</td>
+      <td><code>id</code>: The ID of the customer.</td>
+    </tr>
+    <tr>
+      <td>/api/customers/{id}/balance</td>
+      <td>GET</td>
+      <td>Retrieves the balance of the customer by their ID.</td>
+      <td>Balance of the customer</td>
+      <td>N/A</td>
+      <td><code>id</code>: The ID of the customer.</td>
+    </tr>
+    <tr>
+      <td>/api/customers/{id}/loans</td>
+      <td>GET</td>
+      <td>Retrieves the loans of the customer by their ID.</td>
+      <td>Array of loans</td>
+      <td>N/A</td>
+      <td><code>id</code>: The ID of the customer.</td>
+    </tr>
+    <tr>
+      <td>/api/customers/{id}/payments</td>
+      <td>GET</td>
+      <td>Retrieves the payments of the customer by their ID.</td>
+      <td>Array of payments</td>
+      <td>N/A</td>
+      <td><code>id</code>: The ID of the customer.</td>
+    </tr>
+    <tr>
+      <td>/api/customers/</td>
+      <td>POST</td>
+      <td>Creates a new customer.</td>
+      <td><code>201 Created</code> with the created <code>Customer</code> object and the location of the new resource.</td>
+      <td>A <code>Customer</code> object.</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>/api/customers/{id}</td>
+      <td>PUT</td>
+      <td>Updates an existing customer.</td>
+      <td><code>204 No Content</code> if the update is successful, or <code>404 Not Found</code> if the customer does not exist.</td>
+      <td>A <code>Customer</code> object with the fields to update.</td>
+      <td><code>id</code>: The ID of the customer to update.</td>
+    </tr>
+    <tr>
+      <td>/api/customers/{id}</td>
+      <td>DELETE</td>
+      <td>Deletes a specific customer by their ID.</td>
+      <td><code>200 OK</code> if the deletion is successful, or <code>404 Not Found</code> if the customer does not exist.</td>
+      <td>N/A</td>
+      <td><code>id</code>: The ID of the customer to delete.</td>
+    </tr>
+  </tbody>
+</table>
+</details>
+
+Endpoint: `http://127.0.0.1:8000/api/customers/`
+
 - **Create a Customer**
   - **Endpoint**: `/api/customers/`
   - **Method**: `POST`
@@ -128,6 +200,8 @@ To interact with the API, you can use tools like `curl`, Postman, or any HTTP cl
     ```
 
 ### Loan Management
+
+Endpoint: `http://127.0.0.1:8000/api/loans/`
 
 - **Create a Loan**
   - **Endpoint**: `/api/loans/`
@@ -151,6 +225,8 @@ To interact with the API, you can use tools like `curl`, Postman, or any HTTP cl
     }
     ```
 ### Payment Management
+
+- **Endpoint**: `http://127.0.0.1:8000/api/payments/`
 
 - **Create a Payment**
   - **Endpoint**: `/api/payments/`
@@ -183,12 +259,5 @@ To interact with the API, you can use tools like `curl`, Postman, or any HTTP cl
 Execute the Django test runner to run all tests in the project.
 
 ```bash
-python manage.py test
-```
-
-## Testing
-
-To run tests, use:
-```
 python manage.py test
 ```
