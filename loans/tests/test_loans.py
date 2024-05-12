@@ -91,18 +91,19 @@ class LoansTests(APITestCase):
         """ Test create new user loan with status active (2) """
         # Arrange / Act
         self.loan_body['status'] = LOANS_STATUS['ACTIVE']
-        response_loans = self.client.post(self.loans_url, self.loan_body, format='json').data
+        response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
         loan = Loan.objects.get()
 
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_201_CREATED)
         self.assertEqual(loan.taken_at.date(), datetime.now().date())
-        self.assertEqual(response_loans.get('status'), LOANS_STATUS['ACTIVE'])
-        self.assertEqual(response_loans.get('amount'), response_loans.data.get('outstanding'))
+        self.assertEqual(response_loans.data.get('status'), LOANS_STATUS['ACTIVE'])
+        self.assertEqual(response_loans.data.get('amount'), response_loans.data.get('outstanding'))
 
     def test_create_loan_with_status_rejected(self):
         """ Test create new user loan with status rejected (3) """
         # Arrange / Act
+
         self.loan_body['status'] = LOANS_STATUS['REJECTED']
         response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
 
