@@ -21,8 +21,8 @@ class LoansTests(APITestCase):
             "external_id": "loan_01",
             "customer": 1
         }
+        self.loans_url = reverse('loan-list')
         self.customers_url = reverse('customer-list')
-        self.url_loans = reverse('loan-list')
 
         # User Auth
         User.objects.create_user(username="test", password="test")
@@ -35,7 +35,7 @@ class LoansTests(APITestCase):
         """ Test create new user with a loan """
         # Arrange / Act
         self.client.post(self.customers_url, self.customer_body, format='json')
-        response_loans = self.client.post(self.url_loans, self.loan_body, format='json')
+        response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
 
         response_expected = {
             'external_id': 'loan_01',
@@ -58,9 +58,9 @@ class LoansTests(APITestCase):
         self.client.post(self.customers_url, self.customer_body, format='json')
 
         self.loan_body["amount"] = 4000
-        response_loan = self.client.post(self.url_loans, self.loan_body, format='json')
+        response_loan = self.client.post(self.loans_url, self.loan_body, format='json')
 
-        # Assert
+        # Assertg
         self.assertEqual(response_loan.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_creta_loan_get_customer_loans(self):
@@ -68,7 +68,7 @@ class LoansTests(APITestCase):
         # Arrange / Act
         self.client.post(self.customers_url, self.customer_body, format='json')
 
-        self.client.post(self.url_loans, self.loan_body, format='json')
+        self.client.post(self.loans_url, self.loan_body, format='json')
         response_loans = self.client.get(f'{self.customers_url}1/loans/')
 
         # Assert
@@ -80,9 +80,9 @@ class LoansTests(APITestCase):
         # Arrange / Act
         self.client.post(self.customers_url, self.customer_body, format='json')
 
-        self.client.post(self.url_loans, self.loan_body, format='json')
+        self.client.post(self.loans_url, self.loan_body, format='json')
 
-        response = self.client.post(self.url_loans, self.loan_body, format='json')
+        response = self.client.post(self.loans_url, self.loan_body, format='json')
         expected_result = {'external_id': ['loan with this external id already exists.']}
 
         # Assert
@@ -96,7 +96,7 @@ class LoansTests(APITestCase):
         self.client.post(self.customers_url, self.customer_body, format='json')
 
         self.loan_body['status'] = LOANS_STATUS['ACTIVE']
-        response_loans = self.client.post(self.url_loans, self.loan_body, format='json')
+        response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
 
 
         response_expected = {
@@ -120,7 +120,7 @@ class LoansTests(APITestCase):
         self.client.post(self.customers_url, self.customer_body, format='json')
 
         self.loan_body['status'] = LOANS_STATUS['REJECTED']
-        response_loans = self.client.post(self.url_loans, self.loan_body, format='json')
+        response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
 
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_400_BAD_REQUEST)
@@ -131,7 +131,7 @@ class LoansTests(APITestCase):
         self.client.post(self.customers_url, self.customer_body, format='json')
 
         self.loan_body['status'] = LOANS_STATUS['PAID']
-        response_loans = self.client.post(self.url_loans, self.loan_body, format='json')
+        response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
 
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_400_BAD_REQUEST)
