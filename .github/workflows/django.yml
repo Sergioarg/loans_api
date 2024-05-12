@@ -1,4 +1,4 @@
-name: Django CI
+name: Django Rest Framework CI
 
 on:
   push:

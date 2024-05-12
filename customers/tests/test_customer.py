@@ -79,7 +79,6 @@ class CustomersTests(APITestCase):
         self.assertEqual(response.data['results'][0], customer_expected)
         self.assertEqual(response.data['results'][1], other_customer_expected)
 
-
     def test_get_customer_balance(self):
         """Test creating a new user"""
         # Arrange / Act
@@ -102,6 +101,17 @@ class CustomersTests(APITestCase):
         self.client.post(self.customers_url, self.customer_body, format='json')
         customer_id = 1
         response = self.client.get(f'{self.customers_url}{customer_id}/loans/')
+        response_expected = []
+        # Assert
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, response_expected)
+
+    def test_get_customer_payments(self):
+        # Arrange / Act
+        """ Test create get payments of customer """
+        self.client.post(self.customers_url, self.customer_body, format='json')
+        customer_id = 1
+        response = self.client.get(f'{self.customers_url}{customer_id}/payments/')
         response_expected = []
         # Assert
         self.assertEqual(response.status_code, status.HTTP_200_OK)
