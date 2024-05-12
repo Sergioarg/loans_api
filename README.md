@@ -66,7 +66,20 @@ The server will start at `http://localhost:8000`.
 
 ## API Endpoints
 
-- customers:  `http://127.0.0.1:8000/api/customers/`
+**Customers**: `/api/customers/`
+
+
+| Endpoint | Method | Description | Response | Request Body | Parameters |
+|----------|--------|-------------|-----------|--------------|------------|
+| `/api/customers/` | GET | Retrieves a list of all customtomers. | An array of `Customer` objects. | N/A | N/A |
+| `/api/customers/{id}` | GET | Retrieves a specific customer by their ID. | A `Customer` object or `404 Not Found` if the customer does not exist. | N/A | `id`: The ID of the customer. |
+| `/api/customers/{id}/balance` | GET | Retrieves the balance of the customer by their ID. | Balance of the customer | N/A | `id`: The ID of the customer. |
+| `/api/customers/{id}/loans` | GET | Retrieves the loans of the customer by their ID. | array of loans | N/A | `id`: The ID of the customer. |
+| `/api/customers/{id}/payments` | GET | Retrieves the payments of the customer by their ID. | array of patyments | N/A | `id`: The ID of the customer. |
+| `/api/customers/` | POST | Creates a new customer. | `201 Created` with the created `Customer` object and the location of the new resource. | A `Customer` object. | N/A |
+| `/api/customers/{id}` | PUT | Updates an existing customer. | `204 No Content` if the update is successful, or `404 Not Found` if the customer does not exist. | A `Customer` object with the fields to update. | `id`: The ID of the customer to update. |
+| `/api/customers/{id}` | DELETE | Deletes a specific customer by their ID. | `200 OK` if the deletion is successful, or `404 Not Found` if the customer does not exist. | N/A | `id`: The ID of the customer to delete. |
+
 - loans:  `http://127.0.0.1:8000/api/loans/`
 - payments:  `http://127.0.0.1:8000/api/payments/`
 
