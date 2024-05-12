@@ -104,10 +104,11 @@ class PaymentSerializer(serializers.ModelSerializer):
             int: status correct
         """
         payment = self.instance
-        if payment.status == PAYMENT_STATUS["REJECTED"] and status == PAYMENT_STATUS["COMPLETED"]:
-            raise serializers.ValidationError(
-                "Cannot change rejected status to accepted status"
-            )
+        if payment:
+            if payment.status == PAYMENT_STATUS["REJECTED"] and status == PAYMENT_STATUS["COMPLETED"]:
+                raise serializers.ValidationError(
+                    "Cannot change rejected status to accepted status"
+                )
         return status
 
 

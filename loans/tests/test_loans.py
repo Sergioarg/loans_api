@@ -103,7 +103,6 @@ class LoansTests(APITestCase):
     def test_create_loan_with_status_rejected(self):
         """ Test create new user loan with status rejected (3) """
         # Arrange / Act
-
         self.loan_body['status'] = LOANS_STATUS['REJECTED']
         response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
 
@@ -115,6 +114,15 @@ class LoansTests(APITestCase):
         # Arrange / Act
         self.loan_body['status'] = LOANS_STATUS['PAID']
         response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
+
+        # Assert
+        self.assertEqual(response_loans.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_loan_after_created(self):
+        """ Test create new user loan with status paid (4) """
+        # Arrange / Act
+        self.client.post(self.loans_url, self.loan_body, format='json')
+        response_loans = self.client.put(f"{self.loans_url}1/", self.loan_body, format='json')
 
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_400_BAD_REQUEST)

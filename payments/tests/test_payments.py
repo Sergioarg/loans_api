@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from customers.models import Customer
-from constans import LOANS_STATUS
+from constans import LOANS_STATUS, PAYMENT_STATUS
 class PaymentsTests(APITestCase):
     """ Test Payments Services """
 
@@ -63,12 +63,22 @@ class PaymentsTests(APITestCase):
         # Assert
         self.assertEqual(response_payments.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_create_payment_with_out_payment_loans_details_key(self):
+    def test_create_payment_without_payment_loans_details_key(self):
         """ Test create grather than total debts """
         # Arrange / Act
-        self.payment_body["payment_loan_detail"] = self.payment_body.pop("payment_loan_details")
+        self.payment_body.pop("payment_loan_details")
         self.client.post(self.loans_url, self.loan_body, format='json')
 
+        response_payments = self.client.post(self.payments_url, self.payment_body, format='json')
+
+        # Assert
+        self.assertEqual(response_payments.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_payment_with_payment_loans_details_key_diffrent_as_list(self):
+        """ Test create grather than total debts """
+        # Arrange / Act
+        self.payment_body["payment_loan_details"] = "TEST"
+        self.client.post(self.loans_url, self.loan_body, format='json')
         response_payments = self.client.post(self.payments_url, self.payment_body, format='json')
 
         # Assert
@@ -84,5 +94,20 @@ class PaymentsTests(APITestCase):
         # Assert
         self.assertEqual(get_loan.get('status'), LOANS_STATUS["PAID"])
         self.assertEqual(get_loan.get('outstanding'), '0.00')
+        self.assertEqual(create_loan.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response_payments.status_code, status.HTTP_201_CREATED)
+
+    def test_create_payment_status_rejected_and_check_loan_outstanding(self):
+        """ Test create payment with status rejected than total debts """
+        # Arrange / Act
+        create_loan = self.client.post(self.loans_url, self.loan_body, format='json')
+        self.payment_body["status"] = PAYMENT_STATUS["REJECTED"]
+        response_payments = self.client.post(self.payments_url, self.payment_body, format='json')
+
+        get_loan = self.client.get(f"{self.loans_url}1/").data
+        total_amount = float(response_payments.data.get('total_amount'))
+        # Assert
+        self.assertEqual(get_loan.get('status'), LOANS_STATUS["PENDING"])
+        self.assertEqual(float(get_loan.get('outstanding')), total_amount)
         self.assertEqual(create_loan.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response_payments.status_code, status.HTTP_201_CREATED)
