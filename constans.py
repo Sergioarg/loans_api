@@ -1,11 +1,11 @@
 """  Constans of statuses """
 
-CUSTOMER_STATUS = {
+PAYMENT_STATUS = {
     "COMPLETED": 1,
     "REJECTED": 2
 }
 
-USER_STATUS = {
+CUSTOMER_STATUS = {
     "ACTIVE": 1,
     "INACTIVE": 2
 }

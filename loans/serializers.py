@@ -92,18 +92,18 @@ class LoanSerializer(serializers.ModelSerializer):
         loan = self.instance
         if loan is None:
             if status == LOANS_STATUS['REJECTED'] or status == LOANS_STATUS['PAID']:
-                raise serializers.ValidationError({
-                    "status": f"You can't create a loan with the status {status}"
-                })
+                raise serializers.ValidationError(
+                    f"You can't create a loan with the status {status}"
+                )
         else:
             if status == LOANS_STATUS['REJECTED'] and loan.status != LOANS_STATUS['PENDING']:
-                raise serializers.ValidationError({
-                    "status": f"You can update status into rejected only if the status is pending"
-                })
-            if loan.status == LOANS_STATUS['PAID']:
-                raise serializers.ValidationError({
-                    "status": "You can't update a loan paid"
-                })
+                raise serializers.ValidationError(
+                    "You can update status into rejected only if the status is pending"
+                )
+            if status == LOANS_STATUS['PAID'] and loan.outstanding > 0 :
+                raise serializers.ValidationError(
+                    f"You can't update a loan into paid with outstanding pending {loan.outstanding}"
+                )
 
         return status
 
