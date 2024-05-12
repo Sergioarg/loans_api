@@ -114,7 +114,7 @@ Endpoint: `http://127.0.0.1:8000/api/token-auth/`
       <td>N/A</td>
     </tr>
     <tr>
-      <td>/api/customers/{id}</td>
+      <td>/api/customers/{id}/</td>
       <td>GET</td>
       <td>Retrieves a specific customer by their ID.</td>
       <td>A <code>Customer</code> object or <code>404 Not Found</code> if the customer does not exist.</td>
@@ -154,7 +154,7 @@ Endpoint: `http://127.0.0.1:8000/api/token-auth/`
       <td>N/A</td>
     </tr>
     <tr>
-      <td>/api/customers/{id}</td>
+      <td>/api/customers/{id}/</td>
       <td>PUT</td>
       <td>Updates an existing customer.</td>
       <td><code>204 No Content</code> if the update is successful, or <code>404 Not Found</code> if the customer does not exist.</td>
@@ -162,7 +162,7 @@ Endpoint: `http://127.0.0.1:8000/api/token-auth/`
       <td><code>id</code>: The ID of the customer to update.</td>
     </tr>
     <tr>
-      <td>/api/customers/{id}</td>
+      <td>/api/customers/{id}/</td>
       <td>DELETE</td>
       <td>Deletes a specific customer by their ID.</td>
       <td><code>200 OK</code> if the deletion is successful, or <code>404 Not Found</code> if the customer does not exist.</td>
