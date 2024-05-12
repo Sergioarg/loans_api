@@ -121,11 +121,21 @@ class PaymentSerializer(serializers.ModelSerializer):
             serializers.ValidationError: Cummon edge cases at moment to create payment
 
         Returns:
-            dict: loans details with correct data
+            list: list of dicts loans details with correct data
         """
         customer_id = self.initial_data.get('customer')
         total_amount = self.initial_data.get('total_amount')
         customer = Customer.objects.get(pk=customer_id)
+
+        if not payment_loan_details_data:
+            raise serializers.ValidationError({
+                "payment_loan_details": "This field is required"
+            })
+
+        if not isinstance(payment_loan_details_data, list):
+            raise serializers.ValidationError({
+                "payment_loan_details": "This field should be a list of dicts"
+            })
 
         details_amouts = 0
         for detail_data in payment_loan_details_data:
