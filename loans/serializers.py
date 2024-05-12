@@ -67,6 +67,15 @@ class LoanSerializer(serializers.ModelSerializer):
                 )
         return amount
 
+    def validate(self, attrs):
+        loan = self.instance
+        # Check data in case of are new loan
+        if loan is not None:
+            if attrs.get("amount"):
+                del attrs["amount"]
+
+        return super().validate(attrs)
+
     def validate_status(self, status):
         """Validate status of the new loan to create
 
@@ -79,11 +88,23 @@ class LoanSerializer(serializers.ModelSerializer):
         Returns:
             dict: data of the loan
         """
+        # Check when is a new loan
+        loan = self.instance
+        if loan is None:
+            if status == LOANS_STATUS['REJECTED'] or status == LOANS_STATUS['PAID']:
+                raise serializers.ValidationError({
+                    "status": f"You can't create a loan with the status {status}"
+                })
+        else:
+            if status == LOANS_STATUS['REJECTED'] and loan.status != LOANS_STATUS['PENDING']:
+                raise serializers.ValidationError({
+                    "status": f"You can update status into rejected only if the status is pending"
+                })
+            if loan.status == LOANS_STATUS['PAID']:
+                raise serializers.ValidationError({
+                    "status": "You can't update a loan paid"
+                })
 
-        if status == LOANS_STATUS['REJECTED'] or status == LOANS_STATUS['PAID']:
-            raise serializers.ValidationError({
-                "status": f"You can't create a loan with the status {status}"
-            })
         return status
 
     def create(self, validated_data):
