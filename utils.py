@@ -2,6 +2,7 @@
 from django.db import models
 from customers.models import Customer
 from loans.models import Loan
+from constans import LOANS_STATUS
 
 def calculate_total_debt(customer: Customer) -> float:
     """Calculate the total debt of the customer
@@ -14,8 +15,9 @@ def calculate_total_debt(customer: Customer) -> float:
     """
     total_debt = Loan.objects.filter(
         customer=customer,
-        status__in=[0, 1]
-    ).aggregate(total_debt=models.Sum('outstanding')).get('total_debt', 0)
+        status__in=(0, LOANS_STATUS['PENDING'], LOANS_STATUS['ACTIVE'])
+    ).aggregate(total_debt=models.Sum('outstanding')
+    ).get('total_debt', 0)
 
     if not total_debt:
         total_debt = 0

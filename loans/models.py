@@ -1,11 +1,11 @@
-""" Model Loans """
-from django.db import models
-from django.core.validators import MinValueValidator
-from customers.models import Customer
+""" Models of loans app """
 from decimal import Decimal
+from django.core.validators import MinValueValidator
+from django.db import models
+from customers.models import Customer
 
 class Loan(models.Model):
-    """ Model Loans """
+    """ Represntatioal model Loan """
     STATUS_LOANS_CHOICES = (
         (1, 'Pending'),
         (2, 'Active'),

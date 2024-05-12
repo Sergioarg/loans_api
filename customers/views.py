@@ -1,4 +1,4 @@
-""" Module with CustomerViewSet """
+""" Module of CustomerViewSet """
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -14,9 +14,7 @@ from .models import Customer
 from .serializers import CustomerSerializer
 
 class CustomerViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet of Customer model
-    """
+    """ ViewSet of Customer model """
     # pylint: disable=E1101, W0613
     queryset = Customer.objects.all().order_by('id')
     serializer_class = CustomerSerializer
@@ -24,18 +22,16 @@ class CustomerViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['GET'])
     def loans(self, request, pk) -> Response:
-
-        """ Retrive all loans by customer id """
+        """ Retrieves the loans of the customer by their ID """
         customer = self.get_object()
         loans = Loan.objects.filter(customer=customer)
         serializer = LoanSerializer(loans, many=True)
 
         return Response(serializer.data)
 
-
     @action(detail=True, methods=['GET'])
     def balance(self, request, pk) -> Response:
-        """ Returns all loans realted with the customer """
+        """ Retrieves the balance of the customer by their ID """
 
         customer = self.get_object()
         total_debt = calculate_total_debt(customer=customer)
@@ -55,7 +51,8 @@ class CustomerViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['GET'])
     def payments(self, request, pk) -> Response:
-        """ Retrive all payments of the user customer id """
+        """ Retrieves the payments of the customer by their ID """
+
         customer = self.get_object()
         payments = Payment.objects.filter(customer=customer)
 

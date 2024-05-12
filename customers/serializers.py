@@ -6,6 +6,7 @@ from .models import Customer
 class CustomerSerializer(serializers.ModelSerializer):
     """ Serializer of Customer model. """
     class Meta:
+        """ Class Meta """
         model = Customer
         fields = (
             "score",

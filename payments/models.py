@@ -1,4 +1,4 @@
-""" Model Payment """
+""" Models of app payments """
 from decimal import Decimal
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -7,7 +7,7 @@ from loans.models import Loan
 
 
 class Payment(models.Model):
-    """ Model Payment """
+    """ Represetantional model Payment """
 
     STATUS_PAYMENT_CHOICES = (
         (1, 'Completed'),
@@ -31,7 +31,8 @@ class Payment(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
 class PaymentLoanDetail(models.Model):
-    """ Payment Loan Detail """
+    """ Represetantional model PaymentLoanDetail """
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

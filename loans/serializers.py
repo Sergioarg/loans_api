@@ -9,11 +9,9 @@ from customers.models import Customer
 from .models import Loan
 
 class LoanSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the Loan model.
-    """
+    """ Serializer for the Loan model. """
     class Meta:
-        """ Class Meta"""
+        """ Class Meta """
         model = Loan
         fields = (
             "external_id",
@@ -41,7 +39,9 @@ class LoanSerializer(serializers.ModelSerializer):
         Returns:
             Decimal: amount requested
         """
+        loan = self.instance
         customer_id = self.initial_data.get('customer')
+
         if customer_id:
             try:
                 customer = Customer.objects.get(id=customer_id)
@@ -53,7 +53,7 @@ class LoanSerializer(serializers.ModelSerializer):
 
             total_amount = Loan.objects.filter(
                 customer=customer,
-                status__in=(0, LOANS_STATUS['PENDING'])
+                status__in=(0, LOANS_STATUS['PENDING'], LOANS_STATUS['ACTIVE'])
             ).aggregate(total_amount=models.Sum('amount')
             ).get('total_amount', 0)
 
@@ -65,16 +65,12 @@ class LoanSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     f"You cannot create for this amount, credit available {available_amount}"
                 )
+        if loan and self.initial_data.get('amount'):
+            raise serializers.ValidationError(
+                "Cannot update amount after created"
+            )
+
         return amount
-
-    def validate(self, attrs):
-        loan = self.instance
-        # Check data in case of are new loan
-        if loan is not None:
-            if attrs.get("amount"):
-                del attrs["amount"]
-
-        return super().validate(attrs)
 
     def validate_status(self, status):
         """Validate status of the new loan to create
@@ -98,11 +94,11 @@ class LoanSerializer(serializers.ModelSerializer):
         else:
             if status == LOANS_STATUS['REJECTED'] and loan.status != LOANS_STATUS['PENDING']:
                 raise serializers.ValidationError(
-                    "You can update status into rejected only if the status is pending"
+                    "Can update status to rejected only if the status is pending"
                 )
             if status == LOANS_STATUS['PAID'] and loan.outstanding > 0 :
                 raise serializers.ValidationError(
-                    f"You can't update a loan into paid with outstanding pending {loan.outstanding}"
+                    f"Cannot update loan to paid with outstanding pending {loan.outstanding}"
                 )
 
         return status

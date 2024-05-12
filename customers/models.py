@@ -1,11 +1,11 @@
-""" Model Customer """
+""" Models of customers app """
 from decimal import Decimal
 from django.db import models
 from django.core.validators import MinValueValidator
 
 
 class Customer(models.Model):
-    """ Represetantion of Customer model """
+    """ Represetantional model Customer """
     STATUS_CHOICES = (
         (1, 'Active'),
         (2, 'Inactive')
