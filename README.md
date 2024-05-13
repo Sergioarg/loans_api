@@ -231,7 +231,7 @@ Endpoint: `http://127.0.0.1:8000/api/loans/`
     ```json
       {
         "total_amount": 1500,
-        "external_id": "payment_02",
+        "external_id": "payment_01",
         "customer": 1,
         "payment_loan_detail": [
             {"loan": 1, "amount": 1500},
@@ -241,13 +241,13 @@ Endpoint: `http://127.0.0.1:8000/api/loans/`
   - **Response**:
     ```json
     {
-      "total_amount": "1500",
+      "total_amount": "2000",
       "status": 4,
       "paid_at": "2024-05-11T23:34:29.703632Z",
-      "external_id": "payment_48",
-      "customer_external_id": "customer_02",
-      "loan_external_id": "loan_02",
-      "payment_amount": 1500.0
+      "external_id": "payment_01",
+      "customer_external_id": "customer_01",
+      "loan_external_id": "loan_01",
+      "payment_amount": 2000.0
     }
     ```
 
