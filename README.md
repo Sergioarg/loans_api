@@ -230,11 +230,11 @@ Endpoint: `http://127.0.0.1:8000/api/loans/`
   - **Body**:
     ```json
       {
-        "total_amount": 1500,
+        "total_amount": 2000,
         "external_id": "payment_01",
         "customer": 1,
         "payment_loan_detail": [
-            {"loan": 1, "amount": 1500},
+            {"loan": 1, "amount": 2000},
         ]
       }
     ```
