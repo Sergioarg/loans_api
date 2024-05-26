@@ -268,4 +268,4 @@ python3 manage.py test
 ### Model ER
 This is the ER diagram of the project.
 
-<img src="imgs/Loans_ER.png" alt="Diagram ER" width="500" height="400">
+<img src="imgs/Loans_ER.png" alt="Diagram ER" width="300" height="200">
