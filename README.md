@@ -66,7 +66,7 @@ The server will start at `http://localhost:8000`.
 
 ## API Endpoints
 
-### Usage.
+### Usage
 
 To interact with the API, you can use tools like `curl`, Postman, or any HTTP client library in your preferred programming language.
 
