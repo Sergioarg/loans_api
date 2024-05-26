@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from loans.models import Loan
 from customers.models import Customer
-from utils.states import LOANS_STATUS
+from utils.states import LoanStatus
 
 class LoansTests(APITestCase):
     """ Test Loans app routes """
@@ -51,7 +51,7 @@ class LoansTests(APITestCase):
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Loan.objects.get().external_id, 'loan_01')
-        self.assertEqual(Loan.objects.get().status, LOANS_STATUS['PENDING'])
+        self.assertEqual(Loan.objects.get().status, LoanStatus.PENDING.value)
         self.assertEqual(response_loans.data, response_expected)
 
     def test_create_loan_grater_than_score(self):
@@ -89,20 +89,20 @@ class LoansTests(APITestCase):
     def test_create_loan_with_status_active(self):
         """ Test create new user loan with status active (2) """
         # Arrange / Act
-        self.loan_body['status'] = LOANS_STATUS['ACTIVE']
+        self.loan_body['status'] = LoanStatus.ACTIVE.value
         response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
         loan = Loan.objects.get()
 
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_201_CREATED)
         self.assertEqual(loan.taken_at.date(), datetime.now().date())
-        self.assertEqual(response_loans.data.get('status'), LOANS_STATUS['ACTIVE'])
+        self.assertEqual(response_loans.data.get('status'), LoanStatus.ACTIVE.value)
         self.assertEqual(response_loans.data.get('amount'), response_loans.data.get('outstanding'))
 
     def test_create_loan_with_status_rejected(self):
         """ Test create new user loan with status rejected (3) """
         # Arrange / Act
-        self.loan_body['status'] = LOANS_STATUS['REJECTED']
+        self.loan_body['status'] = LoanStatus.REJECTED.value
         response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
 
         # Assert
@@ -111,14 +111,14 @@ class LoansTests(APITestCase):
     def test_create_loan_with_status_paid(self):
         """ Test create new user loan with status paid (4) """
         # Arrange / Act
-        self.loan_body['status'] = LOANS_STATUS['PAID']
+        self.loan_body['status'] = LoanStatus.PAID.value
         response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
 
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_loan_after_created(self):
-        """ Test create new user loan with status paid (4) """
+        """ Test update loan after created """
         # Arrange / Act
         self.client.post(self.loans_url, self.loan_body, format='json')
         response_loans = self.client.put(f"{self.loans_url}1/", self.loan_body, format='json')

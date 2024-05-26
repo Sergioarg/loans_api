@@ -1,7 +1,7 @@
 """ Module Serilizers """
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
-from utils.states import LOANS_STATUS, PAYMENT_STATUS
+from utils.states import LoanStatus, PaymentStatus
 from customers.models import Customer
 from loans.models import Loan
 from utils.calculate_total_debt import calculate_total_debt
@@ -104,7 +104,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         """
         payment = self.instance
         if payment:
-            if payment.status == PAYMENT_STATUS["REJECTED"] and status == PAYMENT_STATUS["COMPLETED"]:
+            if payment.status == PaymentStatus.REJECTED.value and status == PaymentStatus.COMPLETED.value:
                 raise serializers.ValidationError(
                     "Cannot change rejected status to accepted status"
                 )
@@ -174,11 +174,12 @@ class PaymentSerializer(serializers.ModelSerializer):
         for detail_data in payment_loan_details_data:
             loan = detail_data.get('loan')
 
-            if payment.status == PAYMENT_STATUS['COMPLETED']:
+            if payment.status == PaymentStatus.COMPLETED.value:
                 loan.outstanding = round(loan.outstanding - detail_data.get('amount'), 2)
 
             if loan.outstanding == 0:
-                loan.status = LOANS_STATUS['PAID']
+                loan.status = LoanStatus.PAID.value
+
             loan.save()
             PaymentLoanDetail.objects.create(payment=payment, **detail_data)
 
