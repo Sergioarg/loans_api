@@ -265,3 +265,7 @@ Execute the Django test runner to run all tests in the project.
 ```bash
 python3 manage.py test
 ```
+### Model ER
+This is the ER diagram of the project.
+
+![Model ER](./imgs/Loans_ER.png)
