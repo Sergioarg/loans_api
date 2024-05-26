@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 from rest_framework import status
 from customers.models import Customer
-from utils.calculate_total_debt import calculate_total_debt
+from utils.calculations import calculate_total_debt
 
 class CustomersTests(APITestCase):
     """ Test customers app routes """

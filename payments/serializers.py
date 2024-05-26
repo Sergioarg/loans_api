@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from utils.states import LoanStatus, PaymentStatus
 from customers.models import Customer
 from loans.models import Loan
-from utils.calculate_total_debt import calculate_total_debt
+from utils.calculations import calculate_total_debt
 from .models import Payment, PaymentLoanDetail
 
 class PaymentLoanDetailSerializer(serializers.ModelSerializer):
