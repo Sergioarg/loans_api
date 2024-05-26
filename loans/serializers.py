@@ -1,10 +1,9 @@
-# pylint: disable=E1101
 """ Module Serilizers """
 from datetime import datetime
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
-from constans import LOANS_STATUS
+from utils.states import LoanStatus
 from customers.models import Customer
 from .models import Loan
 
@@ -27,7 +26,7 @@ class LoanSerializer(serializers.ModelSerializer):
         }
         read_only_fields = ("outstanding",)
 
-    def validate_amount(self, amount):
+    def validate_amount(self, amount) -> int:
         """Validate amount requested could be requested
 
         Args:
@@ -45,15 +44,18 @@ class LoanSerializer(serializers.ModelSerializer):
         if customer_id:
             try:
                 customer = Customer.objects.get(id=customer_id)
-            except ObjectDoesNotExist as exc:
-                _ = exc
+            except ObjectDoesNotExist as exception:
                 raise serializers.ValidationError({
-                    "customer": "Customer not found."
+                    "customer": exception
                 })
 
             total_amount = Loan.objects.filter(
                 customer=customer,
-                status__in=(0, LOANS_STATUS['PENDING'], LOANS_STATUS['ACTIVE'])
+                status__in=(
+                    LoanStatus.INITIAL.value,
+                    LoanStatus.PENDING.value,
+                    LoanStatus.ACTIVE.value
+                )
             ).aggregate(total_amount=models.Sum('amount')
             ).get('total_amount', 0)
 
@@ -72,7 +74,7 @@ class LoanSerializer(serializers.ModelSerializer):
 
         return amount
 
-    def validate_status(self, status):
+    def validate_status(self, status) -> int:
         """Validate status of the new loan to create
 
         Args:
@@ -87,16 +89,16 @@ class LoanSerializer(serializers.ModelSerializer):
         # Check when is a new loan
         loan = self.instance
         if loan is None:
-            if status == LOANS_STATUS['REJECTED'] or status == LOANS_STATUS['PAID']:
+            if status == LoanStatus.REJECTED.value or status == LoanStatus.PAID.value:
                 raise serializers.ValidationError(
                     f"You can't create a loan with the status {status}"
                 )
         else:
-            if status == LOANS_STATUS['REJECTED'] and loan.status != LOANS_STATUS['PENDING']:
+            if status == LoanStatus.REJECTED.value and loan.status != LoanStatus.PENDING.value:
                 raise serializers.ValidationError(
                     "Can update status to rejected only if the status is pending"
                 )
-            if status == LOANS_STATUS['PAID'] and loan.outstanding > 0 :
+            if status == LoanStatus.PAID.value and loan.outstanding > 0 :
                 raise serializers.ValidationError(
                     f"Cannot update loan to paid with outstanding pending {loan.outstanding}"
                 )
@@ -104,7 +106,7 @@ class LoanSerializer(serializers.ModelSerializer):
         return status
 
     def create(self, validated_data):
-        if validated_data.get('status') == LOANS_STATUS['ACTIVE']:
+        if validated_data.get('status') == LoanStatus.ACTIVE.value:
             validated_data['taken_at'] = datetime.now()
 
         return super().create(validated_data)

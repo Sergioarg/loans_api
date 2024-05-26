@@ -1,4 +1,3 @@
-# pylint: disable=E1101
 """ Module with PaymentsViewSet """
 from rest_framework import permissions, viewsets
 

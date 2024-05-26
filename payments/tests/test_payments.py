@@ -1,11 +1,10 @@
-# pylint: disable=E1101
-""" Module to test API """
+""" Module of Payment's Tests """
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from customers.models import Customer
-from constans import LOANS_STATUS, PAYMENT_STATUS
+from utils.states import LoanStatus, PaymentStatus
 class PaymentsTests(APITestCase):
     """ Test Payments Services """
 
@@ -92,7 +91,7 @@ class PaymentsTests(APITestCase):
         get_loan = self.client.get(f"{self.loans_url}1/").data
 
         # Assert
-        self.assertEqual(get_loan.get('status'), LOANS_STATUS["PAID"])
+        self.assertEqual(get_loan.get('status'), LoanStatus.PAID.value)
         self.assertEqual(get_loan.get('outstanding'), '0.00')
         self.assertEqual(create_loan.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response_payments.status_code, status.HTTP_201_CREATED)
@@ -101,13 +100,13 @@ class PaymentsTests(APITestCase):
         """ Test create payment with status rejected than total debts """
         # Arrange / Act
         create_loan = self.client.post(self.loans_url, self.loan_body, format='json')
-        self.payment_body["status"] = PAYMENT_STATUS["REJECTED"]
+        self.payment_body["status"] = PaymentStatus.REJECTED.value
         response_payments = self.client.post(self.payments_url, self.payment_body, format='json')
 
         get_loan = self.client.get(f"{self.loans_url}1/").data
         total_amount = float(response_payments.data.get('total_amount'))
         # Assert
-        self.assertEqual(get_loan.get('status'), LOANS_STATUS["PENDING"])
+        self.assertEqual(get_loan.get('status'), LoanStatus.PENDING.value)
         self.assertEqual(float(get_loan.get('outstanding')), total_amount)
         self.assertEqual(create_loan.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response_payments.status_code, status.HTTP_201_CREATED)

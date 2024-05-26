@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 
 from loans.models import Loan
 from loans.serializers import LoanSerializer
-from utils import calculate_total_debt
+from utils.calculate_total_debt import calculate_total_debt
 
 from payments.models import Payment
 from payments.serializers import PaymentSerializer
@@ -15,7 +15,6 @@ from .serializers import CustomerSerializer
 
 class CustomerViewSet(viewsets.ModelViewSet):
     """ ViewSet of Customer model """
-    # pylint: disable=E1101, W0613
     queryset = Customer.objects.all().order_by('id')
     serializer_class = CustomerSerializer
     permission_classes = (permissions.IsAuthenticated,)

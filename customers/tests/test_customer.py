@@ -1,4 +1,3 @@
-# pylint: disable=E1101
 """ Module to test Customer Services """
 from decimal import Decimal
 from django.urls import reverse
@@ -6,6 +5,7 @@ from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 from rest_framework import status
 from customers.models import Customer
+from utils.calculate_total_debt import calculate_total_debt
 
 class CustomersTests(APITestCase):
     """ Test customers app routes """
@@ -128,3 +128,11 @@ class CustomersTests(APITestCase):
         # Assert
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.json(), expected_result)
+
+    def test_initial_calculate_total_debt(self):
+        """ Test create new customer """
+        # Arrange / Act
+        customer = Customer.objects.create(**self.customer_body)
+        total_debt = calculate_total_debt(customer=customer)
+        # Assert
+        self.assertEqual(total_debt, 0)
