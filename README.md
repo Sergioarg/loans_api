@@ -16,9 +16,9 @@ The API is structured around the following endpoints:
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- Django 3.2 or higher
-- Django REST framework
+- Python 3.10.0 or higher
+- Django 5.0.6 or higher
+- Django REST framework 3.15.1 or higher
 
 ### Installation
 
