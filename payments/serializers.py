@@ -10,12 +10,9 @@ from .models import Payment, PaymentLoanDetail
 class PaymentLoanDetailSerializer(serializers.ModelSerializer):
     """ Serializer for the Customer model. """
     class Meta:
-        """Class Meta"""
+        """ Class Meta """
         model = PaymentLoanDetail
-        fields = (
-            "amount",
-            "loan",
-        )
+        fields = ("amount", "loan")
 
 class PaymentSerializer(serializers.ModelSerializer):
     """
@@ -23,7 +20,7 @@ class PaymentSerializer(serializers.ModelSerializer):
     """
     payment_loan_details = PaymentLoanDetailSerializer(many=True, read_only=True)
     class Meta:
-        """ Class Meta"""
+        """ Class Meta """
         model = Payment
         fields = (
             "total_amount",
@@ -38,7 +35,8 @@ class PaymentSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, attrs):
-        # Validating payment_loan_details
+        # Validating payment_loan_details manually
+
         attrs = super().validate(attrs)
         init_loan_details = self.initial_data.get('payment_loan_details')
         payment_loan_details = self.validate_payment_loan_details(init_loan_details)
@@ -61,6 +59,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         """
         payment = self.instance
         customer_id = self.initial_data.get('customer')
+
         try:
             customer = Customer.objects.get(pk=customer_id)
         except ObjectDoesNotExist as exception:
@@ -123,9 +122,9 @@ class PaymentSerializer(serializers.ModelSerializer):
         Returns:
             list: list of dicts loans details with correct data
         """
+        customer = Customer.objects.get(pk=customer_id)
         customer_id = self.initial_data.get('customer')
         total_amount = self.initial_data.get('total_amount')
-        customer = Customer.objects.get(pk=customer_id)
 
         if not payment_loan_details_data:
             raise serializers.ValidationError({
@@ -150,7 +149,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             # Validate customer loans
             if customer != loan.customer:
                 raise serializers.ValidationError({
-                    "loan": f"This loan id {loan.id} is invalid"
+                    "loan": f"Loan {loan.id} does not belong to customer {customer_id}"
                 })
 
             # Check if outstanding

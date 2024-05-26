@@ -45,9 +45,7 @@ class LoanSerializer(serializers.ModelSerializer):
             try:
                 customer = Customer.objects.get(id=customer_id)
             except ObjectDoesNotExist as exception:
-                raise serializers.ValidationError({
-                    "customer": exception
-                })
+                raise serializers.ValidationError(exception)
 
             total_amount = Loan.objects.filter(
                 customer=customer,
