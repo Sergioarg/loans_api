@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 
 from loans.models import Loan
 from loans.serializers import LoanSerializer
-from utils.calculate_total_debt import calculate_total_debt
+from utils.calculations import calculate_total_debt
 
 from payments.models import Payment
 from payments.serializers import PaymentSerializer

@@ -7,7 +7,7 @@ from rest_framework import status
 from loans.models import Loan
 from customers.models import Customer
 from utils.states import LoanStatus
-from utils.calculate_total_debt import calculate_total_debt
+from utils.calculations import calculate_total_debt
 
 class LoansTests(APITestCase):
     """ Test Loans app routes """

@@ -6,6 +6,7 @@ from rest_framework import serializers
 from utils.states import LoanStatus
 from customers.models import Customer
 from .models import Loan
+from utils.calculations import calculate_total_amount
 
 class LoanSerializer(serializers.ModelSerializer):
     """ Serializer for the Loan model. """
@@ -45,23 +46,9 @@ class LoanSerializer(serializers.ModelSerializer):
             try:
                 customer = Customer.objects.get(id=customer_id)
             except ObjectDoesNotExist as exception:
-                raise serializers.ValidationError({
-                    "customer": exception
-                })
+                raise serializers.ValidationError(exception)
 
-            total_amount = Loan.objects.filter(
-                customer=customer,
-                status__in=(
-                    LoanStatus.INITIAL.value,
-                    LoanStatus.PENDING.value,
-                    LoanStatus.ACTIVE.value
-                )
-            ).aggregate(total_amount=models.Sum('amount')
-            ).get('total_amount', 0)
-
-            if not total_amount:
-                total_amount = 0
-
+            total_amount = calculate_total_amount(customer)
             available_amount = customer.score - total_amount
             if total_amount + amount > customer.score:
                 raise serializers.ValidationError(
