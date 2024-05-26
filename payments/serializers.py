@@ -122,8 +122,8 @@ class PaymentSerializer(serializers.ModelSerializer):
         Returns:
             list: list of dicts loans details with correct data
         """
-        customer = Customer.objects.get(pk=customer_id)
         customer_id = self.initial_data.get('customer')
+        customer = Customer.objects.get(pk=customer_id)
         total_amount = self.initial_data.get('total_amount')
 
         if not payment_loan_details_data:
