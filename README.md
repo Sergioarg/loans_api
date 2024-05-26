@@ -89,7 +89,7 @@ Endpoint: `http://127.0.0.1:8000/api/token-auth/`
     }
     ```
 
-Curl Example:
+- Curl Example:
 ```bash
   curl --location --request GET 'http://127.0.0.1:8000/api/customers/' \
   --header 'Content-Type: application/json' \
