@@ -1,10 +1,9 @@
-# pylint: disable=E1101
 """ Module Serilizers """
 from datetime import datetime
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
-from constans import LOANS_STATUS
+from utils.states import LOANS_STATUS
 from customers.models import Customer
 from .models import Loan
 

@@ -1,11 +1,10 @@
-# pylint: disable=E1101
-""" Module to test API """
+""" Module of Payment's Tests """
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from customers.models import Customer
-from constans import LOANS_STATUS, PAYMENT_STATUS
+from utils.states import LOANS_STATUS, PAYMENT_STATUS
 class PaymentsTests(APITestCase):
     """ Test Payments Services """
 

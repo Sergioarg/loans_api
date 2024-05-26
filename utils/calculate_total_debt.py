@@ -1,11 +1,12 @@
-# pylint: disable=E1101
+""" Module to make calculations """
 from django.db import models
 from customers.models import Customer
 from loans.models import Loan
-from constans import LOANS_STATUS
+from utils.states import LOANS_STATUS
 
 def calculate_total_debt(customer: Customer) -> float:
-    """Calculate the total debt of the customer
+    """
+    Calculate the total debt of the customer
 
     Args:
         customer (Customer): instance of customer

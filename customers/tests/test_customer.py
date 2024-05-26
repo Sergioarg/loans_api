@@ -1,4 +1,3 @@
-# pylint: disable=E1101
 """ Module to test Customer Services """
 from decimal import Decimal
 from django.urls import reverse

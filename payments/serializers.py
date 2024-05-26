@@ -1,11 +1,10 @@
-# pylint: disable=E1101
 """ Module Serilizers """
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
-from constans import LOANS_STATUS, PAYMENT_STATUS
+from utils.states import LOANS_STATUS, PAYMENT_STATUS
 from customers.models import Customer
 from loans.models import Loan
-from utils import calculate_total_debt
+from utils.calculate_total_debt import calculate_total_debt
 from .models import Payment, PaymentLoanDetail
 
 class PaymentLoanDetailSerializer(serializers.ModelSerializer):

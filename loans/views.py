@@ -1,4 +1,3 @@
-# pylint: disable=E1101
 """ Module LoanViewSet """
 from rest_framework import viewsets, permissions
 from .models import Loan

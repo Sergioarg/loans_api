@@ -1,4 +1,3 @@
-# pylint: disable=E1101
 """ Module to test Loans API """
 from datetime import datetime
 from django.contrib.auth.models import User
@@ -7,7 +6,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from loans.models import Loan
 from customers.models import Customer
-from constans import LOANS_STATUS
+from utils.states import LOANS_STATUS
 
 class LoansTests(APITestCase):
     """ Test Loans app routes """

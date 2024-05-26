@@ -1,5 +1,3 @@
-# pylint: disable=E0401, E0611
-""" Urls used """
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 from django.contrib import admin

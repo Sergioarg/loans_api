@@ -1,4 +1,4 @@
-"""  Constans of statuses """
+"""  """
 
 PAYMENT_STATUS = {
     "COMPLETED": 1,

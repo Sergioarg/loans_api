@@ -89,6 +89,14 @@ Endpoint: `http://127.0.0.1:8000/api/token-auth/`
     }
     ```
 
+Curl Example:
+```bash
+  curl --location --request GET 'http://127.0.0.1:8000/api/customers/' \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Token <YOUR_TOKEN>'
+```
+
+
 ### Customers Management
 
 <details>
@@ -214,9 +222,9 @@ Endpoint: `http://127.0.0.1:8000/api/loans/`
     ```json
     {
       "external_id": "loan_01",
-      "amount": "2000.00",
+      "amount": "4000.00",
       "status": 1,
-      "outstanding": "2000.00",
+      "outstanding": "4000.00",
       "customer_external_id": "customer_01"
     }
     ```
@@ -255,5 +263,5 @@ Endpoint: `http://127.0.0.1:8000/api/loans/`
 Execute the Django test runner to run all tests in the project.
 
 ```bash
-python manage.py test
+python3 manage.py test
 ```
