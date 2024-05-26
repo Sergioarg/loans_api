@@ -6,9 +6,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
+  paths-ignore:
+    - '!README.md'
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
