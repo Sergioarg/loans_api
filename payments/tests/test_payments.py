@@ -9,8 +9,10 @@ from utils.states import LoanStatus, PaymentStatus
 
 class PaymentsTests(APITestCase):
     """ Test Payments Actions """
-
     def setUp(self):
+        self.loans_url = reverse('loan-list')
+        self.payments_url = reverse('payment-list')
+        self.auth_url = reverse("api-token-auth")
 
         self.customer_body = {
             "external_id": "customer_01",
@@ -31,14 +33,12 @@ class PaymentsTests(APITestCase):
                 {"loan": 1, "amount": 3000}
             ]
         }
+        self.__create_user_get_token()
 
-        self.loans_url = reverse('loan-list')
-        self.payments_url = reverse('payment-list')
-
+    def __create_user_get_token(self):
         User.objects.create_user(username="test", password="test")
-        auth_url = reverse("api-token-auth")
         test_user_body = {"username": "test", "password": "test"}
-        response = self.client.post(auth_url, test_user_body, format='json')
+        response = self.client.post(self.auth_url, test_user_body, format='json')
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + response.data['token'])
 
         if not Customer.objects.filter(external_id='customer_01').exists():
