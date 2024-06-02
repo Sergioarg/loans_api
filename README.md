@@ -89,13 +89,17 @@ Endpoint: `http://127.0.0.1:8000/api/token-auth/`
     }
     ```
 
+## Accessing the API Endpoints
+
+Once the application is running, you can access the API endpoints using a web browser or a tool like `curl` or Postman.
+
 - Curl Example:
+
 ```bash
   curl --location --request GET 'http://127.0.0.1:8000/api/customers/' \
   --header 'Content-Type: application/json' \
   --header 'Authorization: Token <YOUR_TOKEN>'
 ```
-
 
 ### Customers Management
 

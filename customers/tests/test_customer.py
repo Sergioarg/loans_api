@@ -10,13 +10,16 @@ from utils.calculations import calculate_total_debt
 class CustomersTests(APITestCase):
     """ Test customers app routes """
     def setUp(self):
+        self.customers_url = reverse('customer-list')
+
         self.customer_body = {
             "external_id": "customer_01",
             "score": 1000.00
         }
 
-        self.customers_url = reverse('customer-list')
+        self.__create_user_get_token()
 
+    def __create_user_get_token(self):
         User.objects.create_user(username="test", password="test")
         auth_url = reverse("api-token-auth")
         test_user_body = {"username": "test", "password": "test"}
