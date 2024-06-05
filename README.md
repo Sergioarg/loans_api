@@ -10,13 +10,13 @@ The API is structured around the following endpoints:
 
 ### Authentication
 
-- **Obtain Token Pair**: `POST /api/token-auth/` - Obtain an access token pair.
+- **Obtain Token Pair**: method `POST` in  `/api/token-auth/` - Obtain an access token pair.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.10.0 or higher
+- Python 3.10 or higher
 - Django 5.0.6 or higher
 - Django REST framework 3.15.1 or higher
 
@@ -28,7 +28,7 @@ The API is structured around the following endpoints:
     ```
 2. Create a virtual environment *(optional but recommended)*:
    ```
-   python3 -m venv venv
+   python3 -m venv .venv
    ```
 3. Activate the virtual environment:
    - On Windows:
@@ -237,14 +237,14 @@ Endpoint: `http://127.0.0.1:8000/api/loans/`
   - **Method**: `POST`
   - **Body**:
     ```json
-      {
-        "total_amount": 2000,
-        "external_id": "payment_01",
-        "customer": 1,
-        "payment_loan_detail": [
-            {"loan": 1, "amount": 2000},
-        ]
-      }
+    {
+      "total_amount": 2000,
+      "external_id": "payment_01",
+      "customer": 1,
+      "payment_loan_detail": [
+        {"loan": 1, "amount": 2000},
+      ]
+    }
     ```
   - **Response**:
     ```json
