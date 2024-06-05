@@ -17,15 +17,23 @@ class CustomersTests(APITestCase):
             "score": 1000.00
         }
 
-        self.__create_user_get_token()
+        self.__create_user()
+        self.__get_auth_token()
 
-    def __create_user_get_token(self):
+    def __create_user(self):
+        """ Create test user """
         User.objects.create_user(username="test", password="test")
-        auth_url = reverse("api-token-auth")
-        test_user_body = {"username": "test", "password": "test"}
-        response = self.client.post(auth_url, test_user_body, format='json')
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + response.data['token'])
 
+    def __get_auth_token(self) -> None:
+        """ Get auth token """
+        test_user_body = {"username": "test", "password": "test"}
+        response = self.client.post(self.auth_url, test_user_body, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {response.data["token"]}')
+
+        if not Customer.objects.filter(external_id='customer_01').exists():
+            self.client.post(self.url_customers, self.customer_body, format='json')
+
+    # Tests -------------------------------------------------------------------
     def test_create_customer(self):
         """ Test create new customer """
         # Arrange / Act

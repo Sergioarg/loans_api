@@ -12,8 +12,6 @@ class PaymentsTests(APITestCase):
     def setUp(self):
         self.loans_url = reverse('loan-list')
         self.payments_url = reverse('payment-list')
-        self.auth_url = reverse("api-token-auth")
-        self.url_customers = reverse('customer-list')
 
         self.customer_body = {
             "external_id": "customer_01",
@@ -46,11 +44,11 @@ class PaymentsTests(APITestCase):
     def __get_auth_token(self) -> None:
         """ Get auth token """
         test_user_body = {"username": "test", "password": "test"}
-        response = self.client.post(self.auth_url, test_user_body, format='json')
+        response = self.client.post(reverse("api-token-auth"), test_user_body, format='json')
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {response.data["token"]}')
 
         if not Customer.objects.filter(external_id='customer_01').exists():
-            self.client.post(self.url_customers, self.customer_body, format='json')
+            self.client.post(reverse('customer-list'), self.customer_body, format='json')
 
     def __create_payment(self, payment_body: dict) -> None:
         """ Create a new payment """
