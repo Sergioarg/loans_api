@@ -9,6 +9,7 @@ from customers.models import Customer
 from utils.states import LoanStatus
 from utils.calculations import calculate_total_debt
 
+
 class LoansTests(APITestCase):
     """ Test Loans app routes """
 
@@ -26,23 +27,33 @@ class LoansTests(APITestCase):
             "customer": 1
         }
 
-        self.__create_user_get_token()
+        self.__create_user()
+        self.__get_auth_token()
 
-    def __create_user_get_token(self):
+    # Private Methods ---------------------------------------------------------
+    def __create_user(self):
+        """ Create test user """
         User.objects.create_user(username="test", password="test")
-        auth_url = reverse("api-token-auth")
+
+    def __get_auth_token(self) -> None:
+        """ Get auth token """
         test_user_body = {"username": "test", "password": "test"}
-        response = self.client.post(auth_url, test_user_body, format='json')
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + response.data['token'])
+        response = self.client.post(reverse("api-token-auth"), test_user_body, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {response.data["token"]}')
 
         if not Customer.objects.filter(external_id='customer_01').exists():
-            url_customers = reverse('customer-list')
-            self.client.post(url_customers, self.customer_body, format='json')
+            self.client.post(reverse('customer-list'), self.customer_body, format='json')
 
+    def __create_loan(self, loan_body: dict) -> dict:
+        response = self.client.post(self.loans_url, loan_body, format='json')
+
+        return response
+
+    # Tests -------------------------------------------------------------------
     def test_create_loan(self):
         """ Test create new user with a loan """
         # Arrange / Act
-        response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
+        response_loans = self.__create_loan(self.loan_body)
         customer = Customer.objects.get(id=1)
         total_debt = calculate_total_debt(customer=customer)
 
@@ -60,12 +71,11 @@ class LoansTests(APITestCase):
         self.assertEqual(response_loans.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Loan.objects.get().status, LoanStatus.PENDING.value)
 
-
     def test_create_loan_grater_than_score(self):
         """ Test try to create new user with a loan greater than the score """
         # Arrange / Act
         self.loan_body["amount"] = 4000
-        response_loan = self.client.post(self.loans_url, self.loan_body, format='json')
+        response_loan = self.__create_loan(self.loan_body)
 
         # Assert
         self.assertEqual(response_loan.status_code, status.HTTP_400_BAD_REQUEST)
@@ -73,7 +83,7 @@ class LoansTests(APITestCase):
     def test_get_create_loan_get_customer_loans(self):
         """ Test create a new loan and test customer endpoint """
         # Arrange / Act
-        self.client.post(self.loans_url, self.loan_body, format='json')
+        self.__create_loan(self.loan_body)
         response_loans = self.client.get(f'{self.customers_url}1/loans/')
 
         # Assert
@@ -83,21 +93,20 @@ class LoansTests(APITestCase):
     def test_create_loan_with_existing_external_id(self):
         """ Test create customer with existing external_id """
         # Arrange / Act
-        self.client.post(self.loans_url, self.loan_body, format='json')
+        self.__create_loan(self.loan_body)
 
-        response = self.client.post(self.loans_url, self.loan_body, format='json')
+        response = self.__create_loan(self.loan_body)
         expected_result = {'external_id': ['loan with this external id already exists.']}
 
         # Assert
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.json(), expected_result)
-
+        self.assertEqual(response.data, expected_result)
 
     def test_create_loan_with_status_active(self):
         """ Test create new user loan with status active (2) """
         # Arrange / Act
         self.loan_body['status'] = LoanStatus.ACTIVE.value
-        response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
+        response_loans = self.__create_loan(self.loan_body)
         loan = Loan.objects.get()
 
         # Assert
@@ -110,7 +119,7 @@ class LoansTests(APITestCase):
         """ Test create new user loan with status rejected (3) """
         # Arrange / Act
         self.loan_body['status'] = LoanStatus.REJECTED.value
-        response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
+        response_loans = self.__create_loan(self.loan_body)
 
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_400_BAD_REQUEST)
@@ -119,7 +128,7 @@ class LoansTests(APITestCase):
         """ Test create new user loan with status paid (4) """
         # Arrange / Act
         self.loan_body['status'] = LoanStatus.PAID.value
-        response_loans = self.client.post(self.loans_url, self.loan_body, format='json')
+        response_loans = self.__create_loan(self.loan_body)
 
         # Assert
         self.assertEqual(response_loans.status_code, status.HTTP_400_BAD_REQUEST)
@@ -127,7 +136,7 @@ class LoansTests(APITestCase):
     def test_update_loan_after_created(self):
         """ Test update loan after created """
         # Arrange / Act
-        self.client.post(self.loans_url, self.loan_body, format='json')
+        self.__create_loan(self.loan_body)
         response_loans = self.client.put(f"{self.loans_url}1/", self.loan_body, format='json')
 
         # Assert

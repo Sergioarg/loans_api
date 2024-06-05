@@ -35,7 +35,6 @@ class PaymentsTests(APITestCase):
         self.__create_user()
         self.__get_auth_token()
 
-
     # Private Methods ---------------------------------------------------------
     def __create_user(self):
         """ Create test user """
