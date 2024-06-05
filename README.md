@@ -4,9 +4,20 @@
 
 This documentation outlines how to set up and use the Loans API, a Django backend designed for secure and efficient management of customer and loan data.
 
-## API Endpoints
+## Table of Contents
 
-The API is structured around the following endpoints:
+- [API Endpoints](#api-endpoints)
+- [Authentication](#authentication)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running the Server](#running-the-server)
+- [API Endpoints](#api-endpoints)
+  - [Customers Management](#customers-management)
+  - [Loan Management](#loan-management)
+  - [Payment Management](#payment-management)
+- [Run Tests](#run-tests)
+
 
 ### Authentication
 
@@ -181,8 +192,6 @@ Once the application is running, you can access the API endpoints using a web br
 </table>
 </details>
 
-Endpoint: `http://127.0.0.1:8000/api/customers/`
-
 - **Create a Customer**
   - **Endpoint**: `/api/customers/`
   - **Method**: `POST`
@@ -204,8 +213,6 @@ Endpoint: `http://127.0.0.1:8000/api/customers/`
     ```
 
 ### Loan Management
-
-Endpoint: `http://127.0.0.1:8000/api/loans/`
 
 - **Create a Loan**
   - **Endpoint**: `/api/loans/`
@@ -229,8 +236,6 @@ Endpoint: `http://127.0.0.1:8000/api/loans/`
     }
     ```
 ### Payment Management
-
-- **Endpoint**: `http://127.0.0.1:8000/api/payments/`
 
 - **Create a Payment**
   - **Endpoint**: `/api/payments/`
@@ -266,6 +271,7 @@ Execute the Django test runner to run all tests in the project.
 python3 manage.py test
 ```
 ### Model ER
-This is the ER diagram of the project.
-
-<img src="imgs/Loans_ER.png" alt="Diagram ER" width="500" height="400">
+This is the ER diagram of the project models.
+<p align="center">
+  <img src="imgs/Loans_ER.png" alt="Diagram ER" width="500" height="400">
+</p>
