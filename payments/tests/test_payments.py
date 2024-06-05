@@ -12,7 +12,6 @@ class PaymentsTests(APITestCase):
     def setUp(self):
         self.loans_url = reverse('loan-list')
         self.payments_url = reverse('payment-list')
-        self.auth_url = reverse("api-token-auth")
 
         self.customer_body = {
             "external_id": "customer_01",
@@ -33,22 +32,34 @@ class PaymentsTests(APITestCase):
                 {"loan": 1, "amount": 3000}
             ]
         }
-        self.__create_user_get_token()
+        self.__create_user()
+        self.__get_auth_token()
 
-    def __create_user_get_token(self):
+    # Private Methods ---------------------------------------------------------
+    def __create_user(self):
+        """ Create test user """
         User.objects.create_user(username="test", password="test")
+
+    def __get_auth_token(self) -> None:
+        """ Get auth token """
         test_user_body = {"username": "test", "password": "test"}
-        response = self.client.post(self.auth_url, test_user_body, format='json')
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + response.data['token'])
+        response = self.client.post(reverse("api-token-auth"), test_user_body, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {response.data["token"]}')
 
         if not Customer.objects.filter(external_id='customer_01').exists():
-            url_customers = reverse('customer-list')
-            self.client.post(url_customers, self.customer_body, format='json')
+            self.client.post(reverse('customer-list'), self.customer_body, format='json')
 
+    def __create_payment(self, payment_body: dict) -> None:
+        """ Create a new payment """
+        response = self.client.post(self.payments_url, payment_body, format='json')
+
+        return response
+
+    # Tests -------------------------------------------------------------------
     def test_create_payment_of_customer_without_loans(self):
         """ Test create new user with a loan """
         # Arrange / Act
-        response_payment = self.client.post(self.payments_url, self.payment_body, format='json')
+        response_payment = self.__create_payment(self.payment_body)
 
         # Assert
         self.assertEqual(response_payment.status_code, status.HTTP_400_BAD_REQUEST)
@@ -59,7 +70,7 @@ class PaymentsTests(APITestCase):
         self.client.post(self.loans_url, self.loan_body, format='json')
 
         self.payment_body['total_amount'] = 7000
-        response_payment = self.client.post(self.payments_url, self.payment_body, format='json')
+        response_payment = self.__create_payment(self.payment_body)
 
         # Assert
         self.assertEqual(response_payment.status_code, status.HTTP_400_BAD_REQUEST)
@@ -70,7 +81,7 @@ class PaymentsTests(APITestCase):
         self.payment_body.pop("payment_loan_details")
         self.client.post(self.loans_url, self.loan_body, format='json')
 
-        response_payment = self.client.post(self.payments_url, self.payment_body, format='json')
+        response_payment = self.__create_payment(self.payment_body)
 
         # Assert
         self.assertEqual(response_payment.status_code, status.HTTP_400_BAD_REQUEST)
@@ -80,7 +91,7 @@ class PaymentsTests(APITestCase):
         # Arrange / Act
         self.payment_body["payment_loan_details"] = "TEST"
         self.client.post(self.loans_url, self.loan_body, format='json')
-        response_payment = self.client.post(self.payments_url, self.payment_body, format='json')
+        response_payment = self.__create_payment(self.payment_body)
 
         # Assert
         self.assertEqual(response_payment.status_code, status.HTTP_400_BAD_REQUEST)
@@ -89,7 +100,7 @@ class PaymentsTests(APITestCase):
         """ Test create grather than total debts """
         # Arrange / Act
         create_loan = self.client.post(self.loans_url, self.loan_body, format='json')
-        response_payment = self.client.post(self.payments_url, self.payment_body, format='json')
+        response_payment = self.__create_payment(self.payment_body)
         loan = self.client.get(f"{self.loans_url}1/").data
 
         # Assert
@@ -103,7 +114,7 @@ class PaymentsTests(APITestCase):
         # Arrange / Act
         create_loan = self.client.post(self.loans_url, self.loan_body, format='json')
         self.payment_body["status"] = PaymentStatus.REJECTED.value
-        response_payment = self.client.post(self.payments_url, self.payment_body, format='json')
+        response_payment = self.__create_payment(self.payment_body)
 
         get_loan = self.client.get(f"{self.loans_url}1/").data
         total_amount = float(response_payment.data.get('total_amount'))
