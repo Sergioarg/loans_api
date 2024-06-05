@@ -275,3 +275,11 @@ This is the ER diagram of the project models.
 <p align="center">
   <img src="imgs/Loans_ER.png" alt="Diagram ER" width="500" height="400">
 </p>
+
+<!-- Revisan pruebas unitarias
+
+reducir el acoplamiento
+
+validaciones de reglas de negocio en otro lugar
+
+Separar la lógica de negocio entre las views y los serializars -->
