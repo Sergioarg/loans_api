@@ -7,6 +7,7 @@ from rest_framework import status
 from customers.models import Customer
 from utils.calculations import calculate_total_debt
 
+
 class CustomersTests(APITestCase):
     """ Test customers app routes """
     def setUp(self):
@@ -17,19 +18,31 @@ class CustomersTests(APITestCase):
             "score": 1000.00
         }
 
-        self.__create_user_get_token()
+        self.__create_user()
+        self.__get_auth_token()
 
-    def __create_user_get_token(self):
+    # Private Methods ---------------------------------------------------------
+    def __create_user(self):
+        """ Create test user """
         User.objects.create_user(username="test", password="test")
-        auth_url = reverse("api-token-auth")
-        test_user_body = {"username": "test", "password": "test"}
-        response = self.client.post(auth_url, test_user_body, format='json')
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + response.data['token'])
 
+    def __get_auth_token(self) -> None:
+        """ Get auth token """
+        test_user_body = {"username": "test", "password": "test"}
+        response = self.client.post(reverse("api-token-auth"), test_user_body, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {response.data["token"]}')
+
+    def __create_customer(self, customer_body: dict) -> dict:
+        """ Create test customer """
+        response = self.client.post(self.customers_url, customer_body, format='json')
+
+        return response
+
+    # Tests -------------------------------------------------------------------
     def test_create_customer(self):
         """ Test create new customer """
         # Arrange / Act
-        response = self.client.post(self.customers_url, self.customer_body, format='json')
+        response = self.__create_customer(self.customer_body)
 
         # Assert
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -39,7 +52,7 @@ class CustomersTests(APITestCase):
     def test_get_customer(self):
         """ Test get customer by id """
         # Arrange / Act
-        self.client.post(self.customers_url, self.customer_body, format='json')
+        self.__create_customer(self.customer_body)
         customer_id = 1
         response = self.client.get(f'{self.customers_url}{customer_id}/')
         customer_expected = {
@@ -55,7 +68,7 @@ class CustomersTests(APITestCase):
     def test_get_customers(self):
         """ Test get customers created """
         # Arrange / Act
-        self.client.post(self.customers_url, self.customer_body, format='json')
+        self.__create_customer(self.customer_body)
         other_customer = {
             "external_id": "customer_02",
             "score": 2000.00
@@ -85,7 +98,7 @@ class CustomersTests(APITestCase):
     def test_get_customer_balance(self):
         """Test creating a new user"""
         # Arrange / Act
-        self.client.post(self.customers_url, self.customer_body, format='json')
+        self.__create_customer(self.customer_body)
         customer_id = 1
         response = self.client.get(f'{self.customers_url}{customer_id}/balance/')
         response_expected = {
@@ -101,7 +114,7 @@ class CustomersTests(APITestCase):
     def test_get_customer_loans(self):
         # Arrange / Act
         """ Test create get loans of customer """
-        self.client.post(self.customers_url, self.customer_body, format='json')
+        self.__create_customer(self.customer_body)
         customer_id = 1
         response = self.client.get(f'{self.customers_url}{customer_id}/loans/')
         response_expected = []
@@ -112,7 +125,7 @@ class CustomersTests(APITestCase):
     def test_get_customer_payments(self):
         # Arrange / Act
         """ Test create get payments of customer """
-        self.client.post(self.customers_url, self.customer_body, format='json')
+        self.__create_customer(self.customer_body)
         customer_id = 1
         response = self.client.get(f'{self.customers_url}{customer_id}/payments/')
         response_expected = []
@@ -123,9 +136,9 @@ class CustomersTests(APITestCase):
     def test_create_customer_existing_external_id(self):
         """ Test create customer with existing external_id """
         # Arrange / Act
-        self.client.post(self.customers_url, self.customer_body, format='json')
+        self.__create_customer(self.customer_body)
 
-        response = self.client.post(self.customers_url, self.customer_body, format='json')
+        response = self.__create_customer(self.customer_body)
         expected_result = {'external_id': ['customer with this external id already exists.']}
 
         # Assert
